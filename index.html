@@ -57,38 +57,23 @@
         .logo-area { margin-bottom: 30px; text-align: center; }
 
         .btn {
-            background: var(--dark);
-            color: #fff;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 280px;
-            margin: 8px 0;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: 0.3s;
+            background: var(--dark); color: #fff; border: none; padding: 16px 32px;
+            border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer;
+            width: 280px; margin: 8px 0; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
         }
         .btn:hover { background: var(--accent); }
         .btn:disabled { background: #ccc; cursor: not-allowed; }
-        
         .btn-outline { background: transparent; color: var(--dark); border: 1px solid var(--border); }
 
         .input-modern {
-            width: 280px; padding: 14px; margin-bottom: 12px;
-            border: 1px solid var(--border);
-            border-radius: 10px; font-size: 15px;
-            background: var(--gray-light);
-            box-sizing: border-box; outline: none;
-            color: var(--text);
+            width: 280px; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border);
+            border-radius: 10px; font-size: 15px; background: var(--gray-light);
+            box-sizing: border-box; outline: none; color: var(--text); transition: 0.3s;
         }
 
         .form-container {
-            max-height: 50vh; overflow-y: auto; width: 300px;
-            display: flex; flex-direction: column; align-items: center;
-            padding: 10px 0;
+            max-height: 55vh; overflow-y: auto; width: 300px;
+            display: flex; flex-direction: column; align-items: center; padding: 10px 0;
         }
 
         .checkbox-container {
@@ -98,97 +83,85 @@
         .checkbox-container label { display: flex; align-items: center; margin-bottom: 12px; cursor: pointer; color: var(--text);}
         .checkbox-container input { margin-right: 10px; transform: scale(1.2); cursor: pointer; }
 
-        #lgpd-modal {
+        /* === MODAIS FLUTUANTES (LGPD e LISTA DE VISUALIZAÇÕES) === */
+        .modal-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 100;
-            display: none; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.5); z-index: 100; display: none; 
+            justify-content: center; align-items: center; backdrop-filter: blur(5px);
         }
-        .lgpd-card {
+        .modal-card {
             background: var(--bg); width: 85%; max-width: 420px;
             padding: 25px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
-        .lgpd-scroll-box {
-            height: 180px; overflow-y: auto; border: 1px solid var(--border);
-            padding: 15px; border-radius: 8px; margin-bottom: 20px;
-            font-size: 13px; line-height: 1.6; color: var(--text);
+        .modal-scroll-box {
+            height: 250px; overflow-y: auto; border: 1px solid var(--border);
+            padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; line-height: 1.6; color: var(--text);
+            background: var(--gray-light);
         }
 
         .cam-box {
-            width: 200px; height: 200px; border-radius: 100px;
-            overflow: hidden; border: 4px solid var(--accent);
-            margin-bottom: 15px; background: #000; flex-shrink: 0;
+            width: 200px; height: 200px; border-radius: 100px; overflow: hidden; 
+            border: 4px solid var(--accent); margin-bottom: 15px; background: #000; flex-shrink: 0;
         }
         video { width: 100%; height: 100%; object-fit: cover; }
 
         #radar-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         #canvas-ar { position: absolute; top: 0; left: 0; pointer-events: none; }
-
-        /* Contêiner para os cards em HTML que flutuarão no radar */
-        #html-overlay-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 2; pointer-events: none; overflow: hidden;
-        }
+        #html-overlay-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden; }
 
         /* === DESIGN DO SMARTPHONE MINIMALISTA (GLASSMORPHISM) === */
         .glass-card {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 16px;
-            padding: 12px 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-            min-width: 180px;
-            pointer-events: auto;
-            cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute; background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 16px;
+            padding: 12px 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            min-width: 180px; pointer-events: auto; cursor: pointer; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glass-card:hover { transform: scale(1.05); }
-        .colorblind-mode .glass-card {
-            background: rgba(248, 249, 250, 0.95);
-            border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-        .glass-card h4 {
-            margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #111; letter-spacing: -0.3px;
-        }
-        .glass-card p {
-            margin: 2px 0; font-size: 12px; color: #444; display: flex; align-items: center;
-        }
-        .glass-card p.tap-hint {
-            font-size: 10px; color: var(--accent); margin-top: 6px; font-weight: 600;
-        }
+        .colorblind-mode .glass-card { background: rgba(248, 249, 250, 0.95); border: 1px solid var(--border); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
+        .glass-card h4 { margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: #111; letter-spacing: -0.3px; }
+        .glass-card p { margin: 2px 0; font-size: 12px; color: #444; display: flex; align-items: center; }
+        .glass-card p.tap-hint { font-size: 10px; color: var(--accent); margin-top: 6px; font-weight: 600; }
         .colorblind-mode .glass-card h4, .colorblind-mode .glass-card p { color: #000; }
 
-        /* === ELEMENTOS DE ACESSIBILIDADE === */
-        .accessibility-bar {
-            position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 9999;
-        }
+        /* === ELEMENTOS DE ACESSIBILIDADE E UI === */
+        .accessibility-bar { position: absolute; top: 15px; right: 15px; display: flex; gap: 10px; z-index: 9999; }
         .btn-mini {
-            background: rgba(0, 0, 0, 0.6); color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(4px);
-            padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: bold;
-            cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s;
+            background: rgba(0, 0, 0, 0.6); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px); padding: 6px 12px; border-radius: 20px; font-size: 11px;
+            font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.3s;
         }
         .btn-mini:hover { background: var(--accent); border-color: transparent; }
         
-        /* Animação do microfone ativo */
-        .voice-active {
-            background: var(--danger) !important;
-            animation: pulse 1.5s infinite;
+        .voice-active { background: var(--danger) !important; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); } }
+
+        /* === ZOOM CONTROL === */
+        .zoom-container {
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; z-index: 5;
+            background: rgba(0,0,0,0.5); padding: 15px 10px; border-radius: 30px; backdrop-filter: blur(5px);
         }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
-        }
+        .zoom-slider { appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 8px; height: 150px; outline: none; background: rgba(255,255,255,0.3); border-radius: 5px; cursor: pointer; }
+        .zoom-icon { color: white; font-size: 12px; font-weight: bold; margin: 10px 0; }
+
+        /* === NOTIFICAÇÕES DO RADAR (QUEM TE VIU) === */
+        .radar-notifications-panel { position: absolute; top: 15px; left: 15px; z-index: 5; display: flex; flex-direction: column; gap: 8px; max-width: 220px; }
+        .radar-toast { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-left: 4px solid var(--accent); border-radius: 8px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 11px; animation: slideIn 0.3s ease-out; }
+        .radar-toast strong { font-size: 13px; color: var(--dark); display: block; }
+        .radar-toast span { color: #555; }
+        @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* === ITENS DA LISTA DE VISUALIZADORES === */
+        .viewer-item { background: #fff; padding: 12px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 12px; border: 1px solid var(--border); }
+        .viewer-item h5 { margin: 0 0 6px 0; font-size: 14px; color: var(--accent); }
+        .viewer-item p { margin: 3px 0; color: #444; font-size: 11px; line-height: 1.4; }
+        .btn-block { background: var(--danger); color: white; border: none; padding: 6px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%; transition: 0.2s;}
+        .btn-block:hover { background: #b02a37; }
     </style>
 </head>
 <body>
 
-    <!-- === BARRA DE ACESSIBILIDADE GLOBAL COM IA DE VOZ === -->
+    <!-- === BARRA DE ACESSIBILIDADE GLOBAL COM IA DE VOZ NEURAL === -->
     <div class="accessibility-bar">
         <button class="btn-mini" id="btn-voice" onclick="toggleVoiceAI()">🎙️ Assistente</button>
         <button class="btn-mini" onclick="document.querySelector('[vw-access-button]').click();">🤟 Libras</button>
@@ -201,26 +174,38 @@
             <h2 style="font-weight: 300; letter-spacing: 2px; margin-top: 20px;">GLOBAL INTEGRATION</h2>
         </div>
         <button class="btn" onclick="openLGPD()">Novo Cadastro</button>
-        <button class="btn btn-outline" onclick="startRadarView()">Entrar no Radar</button>
+        <button class="btn btn-outline" onclick="enterRadarWithGPS()">Entrar no Radar</button> <!-- Modificado para exigir GPS -->
         
         <div style="margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; width: 280px; text-align: center;">
             <p style="font-size: 11px; color: #888; margin-bottom: 12px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">Gerenciar Conta</p>
-            <button class="btn btn-outline" style="font-size: 12px; padding: 12px; width: 100%; margin-bottom: 8px; border-color: #999;" onclick="startAuthFlow('edit')">Ocultar/Mostrar Informações</button>
+            <button class="btn btn-outline" style="font-size: 12px; padding: 12px; width: 100%; margin-bottom: 8px; border-color: #999;" onclick="startAuthFlow('profile')">Meu Perfil</button>
             <button class="btn" style="background: var(--danger); font-size: 12px; padding: 12px; width: 100%; opacity: 0.9;" onclick="startAuthFlow('delete')">Excluir Cadastro</button>
         </div>
     </div>
 
     <!-- MODAL LGPD -->
-    <div id="lgpd-modal">
-        <div class="lgpd-card">
+    <div id="lgpd-modal" class="modal-bg">
+        <div class="modal-card">
             <h3 style="margin-top: 0;">Privacidade de Dados</h3>
-            <div class="lgpd-scroll-box">
+            <div class="modal-scroll-box" style="height: 180px;">
                 <p><strong>Conformidade LGPD:</strong></p>
                 <p>Este sistema processa dados biométricos faciais, incluindo o mapeamento neural ocular e estrutural para identificação segura.</p>
-                <p>Você tem o direito de escolher quais dados ficarão visíveis no radar e pode excluir sua conta permanentemente a qualquer momento no menu inicial.</p>
+                <p>Você tem o direito de escolher quais dados ficarão visíveis no radar e pode excluir sua conta permanentemente a qualquer momento.</p>
             </div>
             <button class="btn" style="width: 100%;" onclick="proceedToRegister()">Aceitar e Continuar</button>
             <button class="btn btn-outline" style="width: 100%; border:none; margin-top: 5px;" onclick="location.reload()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- JANELA FLUTUANTE DE VISUALIZAÇÕES -->
+    <div id="viewers-modal" class="modal-bg">
+        <div class="modal-card">
+            <h3 style="margin-top: 0; color: var(--danger);">Quem me visualizou?</h3>
+            <p style="font-size: 11px; color: #666; margin-top: -10px; margin-bottom: 15px;">Locais e horários exatos pelo GPS do Radar.</p>
+            <div class="modal-scroll-box" id="modal-viewers-list">
+                <p style="text-align: center; font-size: 12px; color: #888; margin-top: 40px;">Nenhuma visualização recente encontrada.</p>
+            </div>
+            <button class="btn btn-outline" style="width: 100%; margin-top: 10px; border: 1px solid var(--border);" onclick="closeViewersModal()">Fechar Aba</button>
         </div>
     </div>
 
@@ -240,7 +225,7 @@
         <button class="btn btn-outline" style="border:none; color: #888;" onclick="location.reload()">Voltar</button>
     </div>
 
-    <!-- TELA AUTENTICAÇÃO -->
+    <!-- TELA AUTENTICAÇÃO (ROSTO) -->
     <div id="screen-auth" class="screen">
         <h3 id="auth-title" style="margin-bottom: 20px; text-transform: uppercase; font-size: 16px;">Verificação de Segurança</h3>
         <div class="cam-box"><video id="video-auth" autoplay muted playsinline></video></div>
@@ -248,20 +233,33 @@
         <button class="btn btn-outline" style="border:none; margin-top: 10px;" onclick="location.reload()">Cancelar</button>
     </div>
 
-    <!-- TELA EDIÇÃO DE PRIVACIDADE -->
-    <div id="screen-edit" class="screen">
-        <h3 style="margin-bottom: 5px; text-transform: uppercase; font-size: 16px;">O que mostrar no Radar?</h3>
-        <p style="font-size: 12px; color: #666; margin-bottom: 10px; text-align: center; max-width: 280px;">Marque apenas as informações que deseja deixar públicas.</p>
+    <!-- TELA MEU PERFIL (EDIÇÃO COMPLETA) -->
+    <div id="screen-profile" class="screen">
+        <h3 style="margin-bottom: 5px; text-transform: uppercase; font-size: 16px; color: var(--accent);">Meu Perfil</h3>
         
-        <div class="checkbox-container">
-            <label><input type="checkbox" id="pref-name"> Mostrar Nome</label>
-            <label><input type="checkbox" id="pref-bio"> Mostrar Bio / Cargo</label>
-            <label><input type="checkbox" id="pref-link"> Mostrar Link</label>
-            <label><input type="checkbox" id="pref-contact" style="margin-bottom: 0;"> Mostrar Contato</label>
+        <div class="form-container" style="max-height: 55vh; width: 100%;">
+            <!-- Edição de Dados -->
+            <p style="font-size: 12px; color: #666; margin-bottom: 5px; font-weight: bold;">Meus Dados Base:</p>
+            <input type="text" id="edit-name" class="input-modern" placeholder="Nome Completo">
+            <input type="text" id="edit-bio" class="input-modern" placeholder="Cargo / Bio">
+            <input type="text" id="edit-link" class="input-modern" placeholder="Link">
+            <input type="text" id="edit-contact" class="input-modern" placeholder="Contato">
+
+            <!-- Preferências de Exibição -->
+            <p style="font-size: 12px; color: #666; margin-bottom: 5px; margin-top: 10px; font-weight: bold;">O que mostrar no Radar?</p>
+            <div class="checkbox-container" style="margin-bottom: 5px;">
+                <label><input type="checkbox" id="pref-name"> Mostrar Nome</label>
+                <label><input type="checkbox" id="pref-bio"> Mostrar Bio / Cargo</label>
+                <label><input type="checkbox" id="pref-link"> Mostrar Link</label>
+                <label><input type="checkbox" id="pref-contact" style="margin-bottom: 0;"> Mostrar Contato</label>
+            </div>
+            
+            <!-- Botão da Janela Flutuante de Visualizações -->
+            <button class="btn btn-outline" style="font-size: 12px; border: 1px solid var(--danger); color: var(--danger); width: 280px; padding: 12px; margin-top: 15px; margin-bottom: 10px;" onclick="openViewersModal()">👁️ Ver quem me visualizou</button>
         </div>
         
-        <button class="btn" onclick="savePreferences()">Salvar Preferências</button>
-        <button class="btn btn-outline" style="border:none; margin-top: 5px;" onclick="location.reload()">Sair sem Salvar</button>
+        <button class="btn" style="margin-top: 10px;" onclick="saveProfileChanges()">Salvar Alterações</button>
+        <button class="btn btn-outline" style="border:none; margin-top: 5px;" onclick="location.reload()">Sair do Perfil</button>
     </div>
 
     <!-- TELA RADAR -->
@@ -270,24 +268,27 @@
             <video id="video-radar" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
             <canvas id="canvas-ar"></canvas>
             <div id="html-overlay-container"></div>
+            
+            <div class="radar-notifications-panel" id="live-notifications" style="display: none;"></div>
         </div>
         
-        <button class="btn" style="position: absolute; bottom: 95px; width: auto; padding: 10px 20px; opacity: 0.9; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(5px); z-index: 3;" onclick="switchRadarCamera()">Trocar Câmera</button>
+        <div class="zoom-container" id="zoom-controls" style="display: none;">
+            <div class="zoom-icon">+</div>
+            <input type="range" class="zoom-slider" id="camera-zoom" min="1" max="3" step="0.1" value="1">
+            <div class="zoom-icon">-</div>
+        </div>
         
+        <button class="btn-mini" style="position: absolute; bottom: 150px; z-index: 3; background: rgba(0,0,0,0.8);" onclick="toggleRadarNotifications()">🔔 Ocultar/Mostrar Avisos</button>
+        <button class="btn" style="position: absolute; bottom: 95px; width: auto; padding: 10px 20px; opacity: 0.9; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); backdrop-filter: blur(5px); z-index: 3;" onclick="switchRadarCamera()">Trocar Câmera</button>
         <button class="btn" style="position: absolute; bottom: 30px; width: auto; padding: 12px 24px; opacity: 0.8; background: rgba(0,0,0,0.7); color: white; border: 1px solid rgba(255,255,255,0.2); z-index: 3;" onclick="location.reload()">Sair do Radar</button>
     </div>
 
     <!-- WIDGET VLIBRAS -->
-    <div vw class="enabled">
-        <div vw-access-button class="active"></div>
-        <div vw-plugin-wrapper>
-            <div class="vw-plugin-top-wrapper"></div>
-        </div>
-    </div>
+    <div vw class="enabled"><div vw-access-button class="active"></div><div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div></div>
     <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
     <script>new window.VLibras.Widget('https://vlibras.gov.br/app');</script>
 
-    <!-- SCRIPTS DO SISTEMA -->
+    <!-- SCRIPTS DO SISTEMA GLOBAL INTEGRATION -->
     <script>
         // =========================================================================
         // 1. CONFIGURAÇÕES E BANCO DE DADOS (FIREBASE)
@@ -312,21 +313,23 @@
         let authAction = ''; 
         let authTargetId = null;
         let currentRadarCamMode = "environment"; 
+        
+        let mySecureId = localStorage.getItem('mySecureId') || null;
+        let myNameLocal = localStorage.getItem('myName') || "Usuário Não Identificado";
+        let myCurrentLocation = "Localização Geográfica Desconhecida"; // Endereço preenchido pelo GPS
 
         // =========================================================================
-        // 2. CONTROLES DE ACESSIBILIDADE E IA DE VOZ NEURAL
+        // 2. CONTROLES DE ACESSIBILIDADE E IA NEURAL FEMININA (VOZ E INTERNET)
         // =========================================================================
         function toggleColorblindMode() {
             document.body.classList.toggle('colorblind-mode');
-            if(isVoiceActive) speak("Modo para daltônicos alternado.");
+            if(isVoiceActive) speakNeural("Modo para daltônicos alternado com sucesso.");
         }
 
-        // Variáveis da IA de Voz
         let isVoiceActive = false;
         let speechRecognition;
-        let announcedFaces = new Set(); // Para não repetir o nome o tempo todo
+        let announcedFaces = new Set(); 
 
-        // Inicializar a API de Reconhecimento de Voz (STT)
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
             speechRecognition = new SpeechRecognition();
@@ -336,92 +339,148 @@
 
             speechRecognition.onresult = (event) => {
                 const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
-                console.log("Comando de voz recebido:", transcript);
                 processVoiceCommand(transcript);
             };
-
-            speechRecognition.onerror = (event) => { console.error("Erro no reconhecimento de voz", event); };
-            speechRecognition.onend = () => { if (isVoiceActive) speechRecognition.start(); }; // Mantém escutando se estiver ativo
+            speechRecognition.onend = () => { if (isVoiceActive) speechRecognition.start(); }; 
         }
 
-        // Função para Falar (TTS)
-        function speak(text) {
+        // Síntese de Voz Premium (Filtro rigoroso para vozes femininas de alta qualidade)
+        function speakNeural(text) {
             const synth = window.speechSynthesis;
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'pt-BR';
-            utterance.rate = 1.0;
+            
+            const voices = synth.getVoices();
+            // Tenta pegar a melhor voz neural conectada da biblioteca
+            const premiumFemaleVoice = voices.find(v => v.lang === 'pt-BR' && (v.name.includes('Google português do Brasil') || v.name.includes('Luciana') || v.name.includes('Francisca Premium') || v.name.includes('Feminina'))) 
+                || voices.find(v => v.lang.includes('pt'));
+            
+            if(premiumFemaleVoice) utterance.voice = premiumFemaleVoice;
+            utterance.pitch = 1.1; 
+            utterance.rate = 1.0; 
             synth.speak(utterance);
         }
 
-        // Ativar/Desativar Assistente
         function toggleVoiceAI() {
-            if (!speechRecognition) {
-                alert("Seu navegador não suporta a Inteligência de Voz Neural.");
-                return;
-            }
-            const btn = document.getElementById('btn-voice');
+            if (!speechRecognition) return alert("Seu navegador não suporta a Inteligência de Voz Neural.");
             
+            const btn = document.getElementById('btn-voice');
             if (isVoiceActive) {
                 isVoiceActive = false;
                 speechRecognition.stop();
                 btn.classList.remove('voice-active');
-                speak("Assistente de voz desativada.");
+                speakNeural("Assistente de voz desativada.");
             } else {
                 isVoiceActive = true;
                 speechRecognition.start();
                 btn.classList.add('voice-active');
-                speak("Assistente ativada. Pode falar seu comando, estou ouvindo.");
+                speakNeural("Sejam Bem Vindo à Integração Global, sua rede social presente onde você estiver, estou a sua disposição.");
             }
         }
 
-        // Processamento Semântico de Comandos
-        function processVoiceCommand(command) {
+        // IA capaz de interpretar comandos e buscar respostas na internet (Simulando Chat)
+        async function processVoiceCommand(command) {
+            // Comandos de Sistema
             if (command.includes('cadastro') || command.includes('cadastrar')) {
-                speak("Iniciando novo cadastro.");
-                openLGPD();
-            } 
-            else if (command.includes('radar') || command.includes('escanear')) {
-                speak("Entrando no modo radar militar.");
-                startRadarView();
-            } 
-            else if (command.includes('voltar') || command.includes('sair') || command.includes('início')) {
-                speak("Voltando para a tela inicial.");
-                location.reload();
-            } 
-            else if (command.includes('libras')) {
-                speak("Ativando assistente virtual em Libras.");
-                document.querySelector('[vw-access-button]').click();
-            } 
-            else if (command.includes('daltônico') || command.includes('daltonismo') || command.includes('cor')) {
-                toggleColorblindMode();
-            } 
-            else if (command.includes('câmera') || command.includes('trocar')) {
-                speak("Trocando a câmera do dispositivo.");
-                if(document.getElementById('screen-radar').classList.contains('active')) {
-                    switchRadarCamera();
-                }
+                speakNeural("Iniciando novo cadastro."); openLGPD(); return;
+            } else if (command.includes('radar') || command.includes('escanear')) {
+                enterRadarWithGPS(); return; // O aviso de voz está dentro da função de GPS
+            } else if (command.includes('voltar') || command.includes('sair') || command.includes('início')) {
+                speakNeural("Voltando para a tela inicial."); location.reload(); return;
+            } else if (command.includes('perfil') || command.includes('meu perfil')) {
+                speakNeural("Abrindo autenticação para o seu perfil."); startAuthFlow('profile'); return;
+            } else if (command.includes('libras')) {
+                speakNeural("Ativando assistente virtual em Libras."); document.querySelector('[vw-access-button]').click(); return;
+            } else if (command.includes('daltônico') || command.includes('cor')) {
+                toggleColorblindMode(); return;
+            } else if (command.includes('câmera') || command.includes('trocar')) {
+                speakNeural("Trocando a câmera do dispositivo.");
+                if(document.getElementById('screen-radar').classList.contains('active')) switchRadarCamera(); return;
             }
+
+            // Chat de Interação Comum
+            if (command.includes('tudo bem') || command.includes('como você está')) {
+                speakNeural("Meus sistemas estão operando com cem por cento de eficiência, obrigada por perguntar! Como posso ajudar na sua integração hoje?"); return;
+            }
+            if (command.includes('quem é você') || command.includes('seu nome')) {
+                speakNeural("Eu sou a Inteligência Artificial avançada da Integração Global. Fui projetada para gerenciar sua segurança, radar de localização e responder às suas perguntas."); return;
+            }
+
+            // Cérebro Conectado (Busca na internet via API aberta da Wikipedia para responder o usuário)
+            const questionTrigger = command.match(/(o que é|quem é|quem foi|pesquise sobre|me fale sobre) (.*)/i);
+            if (questionTrigger && questionTrigger[2]) {
+                const query = questionTrigger[2].trim();
+                speakNeural("Buscando informações em meus bancos de dados globais para " + query + ".");
+                try {
+                    const res = await fetch(`https://pt.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`);
+                    const data = await res.json();
+                    if(data.extract) {
+                        speakNeural("Encontrei a resposta: " + data.extract.substring(0, 300) + "..."); 
+                    } else {
+                        speakNeural("Desculpe, não consegui localizar dados precisos sobre este tópico na minha rede.");
+                    }
+                } catch(e) {
+                    speakNeural("Estou com dificuldades para acessar a base de dados externa neste momento.");
+                }
+                return;
+            }
+
+            // Fallback Genérico
+            speakNeural("Comando não reconhecido pelo núcleo do sistema. Você pode pedir para entrar no radar, abrir seu perfil ou me fazer perguntas começando com 'O que é' ou 'Quem foi'.");
         }
+
+        window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
 
         // =========================================================================
-        // 3. SISTEMA HÍBRIDO DE IA (VISÃO)
+        // 3. SISTEMA HÍBRIDO DE IA (VISÃO & OTIMIZAÇÃO ANTI-TRAVAMENTO) E GPS
         // =========================================================================
         async function startApp() {
             try {
                 await auth.signInAnonymously();
                 const MODELS = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js/weights';
-                
                 await faceapi.nets.ssdMobilenetv1.loadFromUri(MODELS); 
                 await faceapi.nets.tinyFaceDetector.loadFromUri(MODELS); 
                 await faceapi.nets.faceLandmark68Net.loadFromUri(MODELS); 
                 await faceapi.nets.faceRecognitionNet.loadFromUri(MODELS); 
-                
                 loadDatabase();
+                if(mySecureId) listenToRadarNotifications();
             } catch (e) { console.error("Erro ao carregar IA:", e); }
         }
 
+        // NOVO: Geolocalização Rigorosa Obrigatória antes do Radar
+        async function enterRadarWithGPS() {
+            if (!("geolocation" in navigator)) {
+                alert("O seu navegador não possui suporte a GPS. Não é possível usar o radar.");
+                return;
+            }
+
+            // Pede permissão de Localização
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                
+                // Converte Latitude/Longitude em Endereço Real usando a API gratuíta Nominatim
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+                    const data = await res.json();
+                    myCurrentLocation = data.display_name || "Endereço oculto ou indefinido";
+                } catch(e) {
+                    myCurrentLocation = `Coordenadas: Lat ${lat.toFixed(3)}, Lon ${lon.toFixed(3)}`;
+                }
+
+                // Inicia o Radar e anuncia a frase nova
+                if(isVoiceActive) speakNeural("Você agora está online.");
+                startRadarView();
+
+            }, (error) => {
+                // Se a pessoa recusou o GPS
+                alert("Atenção: É obrigatório permitir a localização do dispositivo para acessar o Radar de Integração.");
+            }, { enableHighAccuracy: true });
+        }
+
+
         // =========================================================================
-        // 4. CONTROLE DE INTERFACE E CÂMERAS
+        // 4. CONTROLE DE INTERFACE, CÂMERAS E ZOOM
         // =========================================================================
         function openLGPD() { document.getElementById('lgpd-modal').style.display = 'flex'; }
         
@@ -437,14 +496,30 @@
             document.getElementById(id).classList.add('active');
         }
 
+        let currentStream = null;
         async function startCamera(id, mode) {
+            if(currentStream) currentStream.getTracks().forEach(t => t.stop());
             const constraints = { video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 720 } } };
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            document.getElementById(id).srcObject = stream;
+            currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+            document.getElementById(id).srcObject = currentStream;
+
+            if(id === 'video-radar') {
+                const track = currentStream.getVideoTracks()[0];
+                const capabilities = track.getCapabilities();
+                if (capabilities.zoom) {
+                    const slider = document.getElementById('camera-zoom');
+                    document.getElementById('zoom-controls').style.display = 'flex';
+                    slider.min = capabilities.zoom.min; slider.max = capabilities.zoom.max; slider.step = capabilities.zoom.step;
+                    slider.value = track.getSettings().zoom || 1;
+                    slider.oninput = (e) => { track.applyConstraints({advanced: [ {zoom: e.target.value} ]}); };
+                } else {
+                    document.getElementById('zoom-controls').style.display = 'none';
+                }
+            }
         }
 
         // =========================================================================
-        // 5. SISTEMA DE CADASTRO E GERENCIAMENTO
+        // 5. SISTEMA DE CADASTRO
         // =========================================================================
         async function monitorCapture() {
             const video = document.getElementById('video-register');
@@ -453,6 +528,12 @@
                 if(!document.getElementById('screen-register').classList.contains('active')) { clearInterval(interval); return; }
                 const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
                 if (detect) {
+                    const match = findBestMatch(detect.descriptor);
+                    if(match.distance < 0.45) {
+                        status.innerText = "Este rosto já possui um cadastro ativo no sistema!";
+                        status.style.color = "var(--danger)";
+                        document.getElementById('save-btn').disabled = true; return;
+                    }
                     currentDescriptor = detect.descriptor;
                     status.innerText = "Rosto e Estrutura Ocular Mapeados!";
                     status.style.color = "#28a745";
@@ -465,9 +546,12 @@
         async function saveIdentity() {
             const nome = document.getElementById('user-name').value;
             const bio = document.getElementById('user-bio').value;
-            const link = document.getElementById('user-link').value;
+            let link = document.getElementById('user-link').value.trim();
             const contact = document.getElementById('user-contact').value;
             if(!nome) return alert("O Nome é obrigatório.");
+            
+            // Corrige o link no salvamento
+            if(link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
             
             const id = "id_" + Date.now();
             await db.ref('identities/' + id).set({
@@ -475,20 +559,24 @@
                 map: Array.from(currentDescriptor),
                 prefs: { showName: true, showBio: true, showLink: true, showContact: true }
             });
-            alert("Cadastro realizado com sucesso!");
-            location.reload();
+            
+            localStorage.setItem('mySecureId', id); localStorage.setItem('myName', nome);
+            alert("Cadastro realizado com sucesso!"); location.reload();
         }
 
+        // =========================================================================
+        // 6. INTEGRAÇÃO E AUTENTICAÇÃO
+        // =========================================================================
         async function loadDatabase() {
             const snap = await db.ref('identities').once('value');
             usersList = [];
             snap.forEach(child => {
                 const val = child.val();
                 usersList.push({ 
-                    id: child.key, 
-                    name: val.name || "", bio: val.bio || "", link: val.link || "", contact: val.contact || "",
+                    id: child.key, name: val.name || "", bio: val.bio || "", link: val.link || "", contact: val.contact || "",
                     descriptor: new Float32Array(val.map),
-                    prefs: val.prefs || { showName: true, showBio: true, showLink: true, showContact: true } 
+                    prefs: val.prefs || { showName: true, showBio: true, showLink: true, showContact: true },
+                    blocked: val.blocked || {}
                 });
             });
         }
@@ -505,8 +593,8 @@
         async function startAuthFlow(action) {
             authAction = action;
             changeScreen('screen-auth');
-            document.getElementById('auth-title').innerText = action === 'delete' ? "Excluir Conta" : "Ocultar Dados";
-            document.getElementById('auth-title').style.color = action === 'delete' ? "var(--danger)" : "var(--dark)";
+            document.getElementById('auth-title').innerText = action === 'delete' ? "Excluir Conta" : "Acessar Meu Perfil";
+            document.getElementById('auth-title').style.color = action === 'delete' ? "var(--danger)" : "var(--accent)";
             await startCamera('video-auth', "user");
             monitorAuth();
         }
@@ -522,61 +610,134 @@
                     const match = findBestMatch(detect.descriptor);
                     if (match.distance < 0.45) { 
                         clearInterval(interval);
-                        status.innerText = `Olá, ${match.name}!`;
-                        status.style.color = "#28a745";
+                        status.innerText = `Autenticado: ${match.name}`; status.style.color = "#28a745";
                         authTargetId = match.id;
+                        localStorage.setItem('mySecureId', match.id); localStorage.setItem('myName', match.name);
+                        
                         setTimeout(() => {
-                            video.srcObject.getTracks().forEach(t => t.stop());
+                            if(currentStream) currentStream.getTracks().forEach(t => t.stop());
+                            
                             if (authAction === 'delete') {
                                 if(confirm(`Deseja excluir a conta de ${match.name} permanentemente?`)) {
-                                    db.ref('identities/' + match.id).remove().then(() => { alert("Conta excluída."); location.reload(); });
+                                    db.ref('identities/' + match.id).remove().then(() => { 
+                                        localStorage.removeItem('mySecureId'); localStorage.removeItem('myName');
+                                        alert("Conta excluída perfeitamente."); location.reload(); 
+                                    });
                                 } else { location.reload(); }
-                            } else if (authAction === 'edit') {
-                                changeScreen('screen-edit');
-                                document.getElementById('pref-name').checked = match.prefs.showName;
-                                document.getElementById('pref-bio').checked = match.prefs.showBio;
-                                document.getElementById('pref-link').checked = match.prefs.showLink;
-                                document.getElementById('pref-contact').checked = match.prefs.showContact;
-                            }
+                            } else if (authAction === 'profile') { openProfileScreen(match); }
                         }, 1200);
-                    } else {
-                        status.innerText = "Rosto não reconhecido.";
-                        status.style.color = "var(--danger)";
-                    }
+                    } else { status.innerText = "Rosto não reconhecido."; status.style.color = "var(--danger)"; }
                 }
             }, 800);
         }
 
-        async function savePreferences() {
-            await db.ref('identities/' + authTargetId + '/prefs').update({
-                showName: document.getElementById('pref-name').checked,
-                showBio: document.getElementById('pref-bio').checked,
-                showLink: document.getElementById('pref-link').checked,
-                showContact: document.getElementById('pref-contact').checked
+        // =========================================================================
+        // 7. MEU PERFIL E JANELA FLUTUANTE DE VISUALIZAÇÕES
+        // =========================================================================
+        function openProfileScreen(match) {
+            changeScreen('screen-profile');
+            document.getElementById('edit-name').value = match.name;
+            document.getElementById('edit-bio').value = match.bio;
+            document.getElementById('edit-link').value = match.link;
+            document.getElementById('edit-contact').value = match.contact;
+            document.getElementById('pref-name').checked = match.prefs.showName;
+            document.getElementById('pref-bio').checked = match.prefs.showBio;
+            document.getElementById('pref-link').checked = match.prefs.showLink;
+            document.getElementById('pref-contact').checked = match.prefs.showContact;
+            
+            // Pré-carrega a lista de visualizações para quando abrir o modal
+            loadViewersLog(match.id);
+        }
+
+        function openViewersModal() { document.getElementById('viewers-modal').style.display = 'flex'; }
+        function closeViewersModal() { document.getElementById('viewers-modal').style.display = 'none'; }
+
+        async function saveProfileChanges() {
+            let newLink = document.getElementById('edit-link').value.trim();
+            if(newLink && !/^https?:\/\//i.test(newLink)) newLink = 'https://' + newLink;
+
+            await db.ref('identities/' + authTargetId).update({
+                name: document.getElementById('edit-name').value, bio: document.getElementById('edit-bio').value,
+                link: newLink, contact: document.getElementById('edit-contact').value,
+                prefs: {
+                    showName: document.getElementById('pref-name').checked, showBio: document.getElementById('pref-bio').checked,
+                    showLink: document.getElementById('pref-link').checked, showContact: document.getElementById('pref-contact').checked
+                }
             });
-            alert("Preferências salvas!");
-            location.reload();
+            localStorage.setItem('myName', document.getElementById('edit-name').value);
+            alert("Perfil atualizado com sucesso!"); location.reload();
+        }
+
+        function loadViewersLog(userId) {
+            const listDiv = document.getElementById('modal-viewers-list');
+            db.ref('identities/' + userId + '/viewers').orderByChild('time').limitToLast(20).once('value', snap => {
+                if(!snap.exists()) return;
+                listDiv.innerHTML = ''; 
+                let viewers = [];
+                snap.forEach(child => { viewers.push({key: child.key, ...child.val()}); });
+                viewers.reverse();
+
+                viewers.forEach(v => {
+                    const date = new Date(v.time).toLocaleString('pt-BR');
+                    listDiv.innerHTML += `
+                        <div class="viewer-item">
+                            <h5>👀 ${v.viewerName}</h5>
+                            <p><strong>📍 Local:</strong> ${v.location}</p>
+                            <p><strong>🕒 Horário:</strong> ${date}</p>
+                            ${v.viewerId !== "anon" ? `<button class="btn-block" onclick="blockUser('${v.viewerId}')">Bloquear Acesso</button>` : `<p style="font-size:10px; color:#888; margin-top:5px;">Anônimo não bloqueável</p>`}
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        async function blockUser(viewerIdToBlock) {
+            if(confirm("Deseja bloquear este usuário? Ele verá apenas um borrão vermelho ao te olhar pelo radar.")) {
+                await db.ref('identities/' + authTargetId + '/blocked/' + viewerIdToBlock).set(true);
+                alert("Usuário bloqueado com sucesso!");
+                loadViewersLog(authTargetId); // Recarrega a lista no modal
+            }
         }
 
         // =========================================================================
-        // 8. RADAR COM BORRÃO VERMELHO E ANÚNCIO DE VOZ
+        // 8. RADAR AR COM OTIMIZAÇÃO E GPS INJETADO
         // =========================================================================
+        let showRadarNotifications = true;
+        function toggleRadarNotifications() {
+            showRadarNotifications = !showRadarNotifications;
+            document.getElementById('live-notifications').style.display = showRadarNotifications ? 'flex' : 'none';
+        }
+
+        function listenToRadarNotifications() {
+            db.ref('identities/' + mySecureId + '/viewers').limitToLast(1).on('child_added', snap => {
+                const v = snap.val();
+                if(Date.now() - v.time < 5000 && showRadarNotifications) {
+                    const panel = document.getElementById('live-notifications');
+                    panel.style.display = 'flex';
+                    const toast = document.createElement('div'); toast.className = 'radar-toast';
+                    toast.innerHTML = `<strong>📡 Alerta de Radar</strong><span>${v.viewerName} está te vendo agora!</span>`;
+                    panel.prepend(toast);
+                    setTimeout(() => { if(panel.contains(toast)) panel.removeChild(toast); }, 4000);
+                }
+            });
+        }
+
         async function switchRadarCamera() {
-            const video = document.getElementById('video-radar');
-            if (video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
-            document.getElementById('html-overlay-container').innerHTML = '';
             currentRadarCamMode = currentRadarCamMode === "environment" ? "user" : "environment";
+            document.getElementById('html-overlay-container').innerHTML = '';
             await startCamera('video-radar', currentRadarCamMode);
         }
 
         async function startRadarView() {
             changeScreen('screen-radar');
-            await startCamera('video-radar', currentRadarCamMode);
             const video = document.getElementById('video-radar');
             const canvas = document.getElementById('canvas-ar');
             const overlayContainer = document.getElementById('html-overlay-container');
             
             const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.35 });
+
+            let lastProcessingTime = 0; 
+            let loggedViewersThisSession = new Set(); 
 
             video.addEventListener('play', () => {
                 const dims = { width: video.clientWidth, height: video.clientHeight };
@@ -585,93 +746,75 @@
                 const processFrame = async () => {
                     if(video.paused || video.ended || !document.getElementById('screen-radar').classList.contains('active')) return;
                     
-                    const detections = await faceapi.detectAllFaces(video, options).withFaceLandmarks().withFaceDescriptors();
-                    const resized = faceapi.resizeResults(detections, dims);
-                    const ctx = canvas.getContext('2d');
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    const currentFrameIds = new Set();
-                    
-                    resized.forEach(d => {
-                        const match = findBestMatch(d.descriptor);
-                        const { x, y, width, height } = d.detection.box;
+                    const now = Date.now();
+                    if (now - lastProcessingTime > 150) {
+                        lastProcessingTime = now;
                         
-                        if (match.distance < 0.45) {
-                            // --- ROSTO CONHECIDO ---
-                            currentFrameIds.add(match.id);
+                        const detections = await faceapi.detectAllFaces(video, options).withFaceLandmarks().withFaceDescriptors();
+                        const resized = faceapi.resizeResults(detections, dims);
+                        const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        const currentFrameIds = new Set();
+                        
+                        resized.forEach(d => {
+                            const match = findBestMatch(d.descriptor);
+                            const { x, y, width, height } = d.detection.box;
+                            const amIBlocked = match.blocked && mySecureId && match.blocked[mySecureId];
 
-                            // IA de Voz fala o nome de quem entrou no radar (apenas uma vez a cada 10 seg)
-                            if (isVoiceActive && !announcedFaces.has(match.id)) {
-                                speak(`Usuário identificado. Olá, ${match.name}.`);
-                                announcedFaces.add(match.id);
-                                setTimeout(() => announcedFaces.delete(match.id), 10000); // Libera para falar de novo depois de 10s
-                            }
+                            if (match.distance < 0.45 && !amIBlocked) {
+                                currentFrameIds.add(match.id);
 
-                            // Moldura fina no Canvas
-                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
-                            ctx.lineWidth = 1.5;
-                            ctx.strokeRect(x, y, width, height);
+                                // Registra no DB injetando o Endereço Real do GPS (myCurrentLocation)
+                                if(!loggedViewersThisSession.has(match.id)) {
+                                    loggedViewersThisSession.add(match.id);
+                                    db.ref('identities/' + match.id + '/viewers').push({
+                                        viewerId: mySecureId || "anon",
+                                        viewerName: myNameLocal,
+                                        time: Date.now(),
+                                        location: myCurrentLocation // AQUI VAI A CIDADE E RUA EXATA
+                                    });
+                                }
 
-                            // Card HTML Glassmorphism
-                            let cardId = `card-${match.id}`;
-                            let card = document.getElementById(cardId);
+                                if (isVoiceActive && !announcedFaces.has(match.id)) {
+                                    speakNeural(`Identifiquei ${match.name} no radar.`);
+                                    announcedFaces.add(match.id); setTimeout(() => announcedFaces.delete(match.id), 12000); 
+                                }
 
-                            if (!card) {
-                                card = document.createElement('div');
-                                card.id = cardId;
-                                card.className = 'glass-card';
+                                ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)'; ctx.lineWidth = 1.5; ctx.strokeRect(x, y, width, height);
+
+                                let cardId = `card-${match.id}`; let card = document.getElementById(cardId);
+                                if (!card) {
+                                    card = document.createElement('div'); card.id = cardId; card.className = 'glass-card';
+                                    let innerContent = '';
+                                    if (match.prefs.showName && match.name) innerContent += `<h4>${match.name}</h4>`;
+                                    if (match.prefs.showBio && match.bio) innerContent += `<p>💼 ${match.bio}</p>`;
+                                    if (match.prefs.showContact && match.contact) innerContent += `<p>📞 ${match.contact}</p>`;
+                                    if (match.prefs.showLink && match.link) innerContent += `<p>🔗 Link Disponível</p>`;
+                                    innerContent += `<p class="tap-hint">Tocar para interagir</p>`;
+                                    
+                                    card.innerHTML = innerContent; overlayContainer.appendChild(card);
+                                    card.onclick = () => {
+                                        if (match.prefs.showLink && match.link) { window.open(match.link, '_blank');
+                                        } else { alert(`Identificação Segura: \nNome: ${match.name}\nContato: ${match.prefs.showContact ? match.contact : 'Privado'}`); }
+                                    };
+                                }
+                                card.style.left = `${x}px`; card.style.top = `${y + height + 15}px`;
                                 
-                                let innerContent = '';
-                                if (match.prefs.showName && match.name) innerContent += `<h4>${match.name}</h4>`;
-                                if (match.prefs.showBio && match.bio) innerContent += `<p>💼 ${match.bio}</p>`;
-                                if (match.prefs.showContact && match.contact) innerContent += `<p>📞 ${match.contact}</p>`;
-                                if (match.prefs.showLink && match.link) innerContent += `<p>🔗 Link Disponível</p>`;
-                                innerContent += `<p class="tap-hint">Tocar para interagir</p>`;
-                                
-                                card.innerHTML = innerContent;
-                                overlayContainer.appendChild(card);
-
-                                card.onclick = () => {
-                                    if (match.prefs.showLink && match.link) {
-                                        window.open(match.link.startsWith('http') ? match.link : 'https://' + match.link, '_blank');
-                                    } else {
-                                        alert(`Identificação Segura: \nNome: ${match.name}\nContato: ${match.prefs.showContact ? match.contact : 'Privado'}`);
-                                    }
-                                };
+                            } else {
+                                ctx.save(); ctx.filter = 'blur(15px)'; ctx.fillStyle = 'rgba(220, 53, 69, 0.9)'; 
+                                const padding = 15; ctx.fillRect(x - padding, y - padding, width + (padding*2), height + (padding*2)); ctx.restore(); 
                             }
-
-                            card.style.left = `${x}px`;
-                            card.style.top = `${y + height + 15}px`;
-                            
-                        } else {
-                            // --- ROSTO DESCONHECIDO (Borrão Vermelho) ---
-                            ctx.save();
-                            ctx.filter = 'blur(15px)'; // Aplica o desfoque pesado
-                            ctx.fillStyle = 'rgba(220, 53, 69, 0.8)'; // Vermelho perigo/alerta translúcido
-                            
-                            // Desenha um retângulo preenchido cobrindo todo o rosto e borrando a área
-                            // Aumentei levemente a margem (padding) para garantir que todo o rosto seja ocultado
-                            const padding = 10;
-                            ctx.fillRect(x - padding, y - padding, width + (padding*2), height + (padding*2));
-                            ctx.restore(); // Restaura o canvas para não borrar o resto da interface
-                        }
-                    });
-                    
-                    // Limpar cards HTML que não estão mais na tela
-                    Array.from(overlayContainer.children).forEach(child => {
-                        const rawId = child.id.replace('card-', '');
-                        if (!currentFrameIds.has(rawId)) {
-                            overlayContainer.removeChild(child);
-                        }
-                    });
-                    
-                    requestAnimationFrame(processFrame);
+                        });
+                        
+                        Array.from(overlayContainer.children).forEach(child => {
+                            const rawId = child.id.replace('card-', '');
+                            if (!currentFrameIds.has(rawId)) overlayContainer.removeChild(child);
+                        });
+                    }
+                    requestAnimationFrame(processFrame); 
                 };
-                
                 processFrame();
             });
         }
-
         startApp();
     </script>
 </body>
