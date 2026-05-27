@@ -52,9 +52,6 @@
         }
         .active { display: flex; }
 
-        .logo-area { margin-bottom: 30px; text-align: center; }
-        .logo-area h2 { font-size: 26px; color: var(--dark); text-transform: uppercase; margin-top: 15px;}
-
         .btn {
             background: var(--dark); color: #fff; border: none; padding: 14px 28px;
             border-radius: 30px; 
@@ -181,13 +178,9 @@
     </div>
 
     <div id="screen-home" class="screen active">
-        <div class="logo-area">
-            <h2 data-i18n="app_title">Interação Global</h2>
-        </div>
-
-        <div class="voice-orb-container" id="voice-home-btn" onclick="toggleVoiceAI()">
+        <div class="voice-orb-container" id="voice-home-btn" onclick="toggleVoiceAI()" style="margin-top: 0; margin-bottom: 40px; transform: scale(1.15);">
             <div class="voice-orb"></div>
-            <div class="orb-label" data-i18n="orb_label">Assistente de Voz</div>
+            <div class="orb-label" data-i18n="orb_label" style="margin-top: 20px;">Assistente de Voz</div>
         </div>
 
         <button class="btn" id="btn-novo-cadastro" onclick="openLGPD()" data-i18n="btn_register">Novo Cadastro</button>
@@ -449,7 +442,6 @@
         // =========================================================================
         async function startApp() {
             try {
-                // Tenta ativar a aceleração WebGL de forma segura (sem conflito de bibliotecas externas)
                 try {
                     await faceapi.tf.setBackend('webgl');
                     console.log("Otimização de Hardware (WebGL) ativada com sucesso.");
@@ -492,7 +484,7 @@
         // =========================================================================
         async function monitorCapture() {
             const video = document.getElementById('video-register'); const status = document.getElementById('ia-status');
-            let isDetecting = false; // Trava anti-lag
+            let isDetecting = false; 
 
             const interval = setInterval(async () => {
                 if(!document.getElementById('screen-register').classList.contains('active')) { clearInterval(interval); return; }
@@ -508,10 +500,10 @@
                                 currentDescriptor = detect.descriptor; status.innerText = "Rosto Mapeado! Finalize o preenchimento."; status.style.color = "#3b82f6"; document.getElementById('save-btn').disabled = false; clearInterval(interval);
                             }
                         }
-                    } catch(e) { /* frame drop evitado */ }
+                    } catch(e) { }
                     isDetecting = false;
                 }
-            }, 300); // Intervalo reduzido para mais agilidade, mas protegido pela trava
+            }, 300); 
         }
 
         async function saveIdentity() {
@@ -547,7 +539,7 @@
 
         async function monitorAuth() {
             const video = document.getElementById('video-auth'); const status = document.getElementById('auth-status');
-            let isDetecting = false; // Trava anti-lag
+            let isDetecting = false; 
 
             const interval = setInterval(async () => {
                 if(!document.getElementById('screen-auth').classList.contains('active')) { clearInterval(interval); return; }
@@ -571,7 +563,7 @@
                                 }, 1200);
                             } else { status.innerText = "Rosto não reconhecido."; status.style.color = "var(--danger)"; }
                         }
-                    } catch(e) { /* frame drop evitado */ }
+                    } catch(e) { }
                     isDetecting = false;
                 }
             }, 300);
@@ -623,7 +615,7 @@
         }
 
         // =========================================================================
-        // 6. RADAR AR E OTIMIZAÇÃO (SEM TRAVAMENTO)
+        // 6. RADAR AR COM CORREÇÃO DE LINK (SWEETALERT MODAL)
         // =========================================================================
         let showRadarNotifications = true;
         function toggleRadarNotifications() { showRadarNotifications = !showRadarNotifications; document.getElementById('live-notifications').style.display = showRadarNotifications ? 'flex' : 'none'; }
@@ -650,7 +642,7 @@
 
             let lastProcessingTime = 0; let loggedViewersThisSession = new Set(); 
             let processingDelay = 200; 
-            let isRadarDetecting = false; // Trava master do Radar
+            let isRadarDetecting = false; 
 
             video.addEventListener('play', () => {
                 const dims = { width: video.clientWidth, height: video.clientHeight }; faceapi.matchDimensions(canvas, dims);
@@ -705,9 +697,20 @@
                                         
                                         card.innerHTML = innerContent; overlayContainer.appendChild(card);
                                         
+                                        // CORREÇÃO DO LINK COM MODAL INTERATIVO
                                         card.onclick = () => {
-                                            if (match.prefs.showLink && match.link) { window.open(match.link, '_blank');
-                                            } else { Swal.fire({ title: match.name, text: match.prefs.showContact ? match.contact : 'Contato Privado', icon: 'info' }); }
+                                            let htmlContent = '';
+                                            if (match.prefs.showBio && match.bio) htmlContent += `<p style="margin: 8px 0; color: #475569;">💼 ${match.bio}</p>`;
+                                            if (match.prefs.showContact && match.contact) htmlContent += `<p style="margin: 8px 0; color: #475569;">📞 ${match.contact}</p>`;
+                                            if (match.prefs.showLink && match.link) htmlContent += `<a href="${match.link}" target="_blank" style="display:inline-block; margin-top:15px; padding:12px 25px; background:var(--accent); color:#fff; border-radius:25px; text-decoration:none; font-size:14px; font-weight:400; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">🔗 Acessar Link</a>`;
+                                            
+                                            Swal.fire({ 
+                                                title: match.prefs.showName ? match.name : 'Usuário Identificado', 
+                                                html: htmlContent || '<p>Informações privadas.</p>',
+                                                showConfirmButton: true,
+                                                confirmButtonText: 'Fechar',
+                                                confirmButtonColor: 'var(--dark)'
+                                            });
                                         };
                                     }
                                     card.style.left = `${x}px`; card.style.top = `${y + height + 15}px`;
@@ -719,7 +722,7 @@
                             });
                             
                             Array.from(overlayContainer.children).forEach(child => { const rawId = child.id.replace('card-', ''); if (!currentFrameIds.has(rawId)) overlayContainer.removeChild(child); });
-                        } catch(e) { /* frame drop evitado silenciosamente */ }
+                        } catch(e) { }
                         isRadarDetecting = false;
                     }
                     requestAnimationFrame(processFrame); 
