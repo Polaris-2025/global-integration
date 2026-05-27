@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title> IG | Secure ID</title>
+    <title>Interação Global | Secure ID</title>
     
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -18,17 +19,17 @@
             --bg-gradient: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
             --bg-card: rgba(255, 255, 255, 0.7);
             --text: #2d3748;
-            --accent: #3b82f6; /* Azul suave e moderno */
-            --dark: #1a202c; /* Cinza muito escuro em vez de preto puro */
-            --danger: #ef4444; /* Vermelho limpo */
+            --accent: #3b82f6;
+            --dark: #1a202c; 
+            --danger: #ef4444; 
             --gray-light: #f8fafc;
             --border: #e2e8f0;
         }
 
         body.colorblind-mode {
             --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            --accent: #d97706; /* Laranja seguro */
-            --danger: #4f46e5; /* Índigo seguro */
+            --accent: #d97706; 
+            --danger: #4f46e5; 
         }
 
         body, html {
@@ -119,7 +120,6 @@
         .accessibility-content button:hover { background: var(--gray-light); color: var(--accent); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Oculta o widget flutuante padrão do VLibras */
         [vw-access-button] { display: none !important; }
 
         /* === ORBE ASSISTENTE DE VOZ NEURAL === */
@@ -182,7 +182,7 @@
 
     <div id="screen-home" class="screen active">
         <div class="logo-area">
-            <h2 data-i18n="app_title"> IG </h2>
+            <h2 data-i18n="app_title">Interação Global</h2>
         </div>
 
         <div class="voice-orb-container" id="voice-home-btn" onclick="toggleVoiceAI()">
@@ -398,7 +398,6 @@
             }
         }
 
-        // --- NÚCLEO DA IA: CONTROLE DO SITE E CONEXÃO EXTERNA ---
         async function conectarNaRedeNeural(pergunta) {
             try {
                 const res = await fetch(`https://pt.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pergunta)}`);
@@ -411,7 +410,6 @@
         async function processVoiceCommand(command) {
             console.log("Comando reconhecido: " + command);
             
-            // LÓGICA DE PREENCHIMENTO DE FORMULÁRIO (DIGITAÇÃO POR VOZ)
             if (command.includes('preencher nome') || command.includes('digitar nome')) {
                 const text = command.split(/nome/)[1].trim(); document.getElementById('user-name').value = text; document.getElementById('edit-name').value = text;
                 speakNeural("Campo nome preenchido com " + text); return;
@@ -425,7 +423,6 @@
                 speakNeural("Link atualizado."); return;
             }
 
-            // LÓGICA DE CLIQUE EM BOTÕES (CONTROLE TOTAL)
             if (command.includes('cadastro') || command.includes('novo usuário')) { document.getElementById('btn-novo-cadastro').click(); speakNeural("Iniciando credenciamento."); return; } 
             if (command.includes('entrar no radar') || command.includes('ligar radar')) { document.getElementById('btn-entrar-radar').click(); return; } 
             if (command.includes('voltar') || command.includes('sair do radar') || command.includes('início')) { location.reload(); speakNeural("Retornando ao centro de controle."); return; } 
@@ -442,7 +439,6 @@
             if (command.includes('quem me visualizou') || command.includes('histórico')) { document.getElementById('btn-ver-visualizacoes').click(); speakNeural("Abrindo registros de varredura."); return; }
             if (command.includes('fechar lista') || command.includes('fechar histórico')) { document.getElementById('btn-fechar-lista').click(); speakNeural("Registro recolhido."); return; }
 
-            // CHAT BOT INTELIGENTE
             if (command.includes('tudo bem') || command.includes('como você está')) { speakNeural("Sistemas operando com máxima eficiência. Pronta para integrar dados."); return; }
             if (command.includes('quem é você') || command.includes('o que você é')) { speakNeural("Sou a inteligência neural da Interação Global. Fui projetada com arquitetura minimalista para facilitar o acesso à biometria facial, dados seguros e radar em tempo real."); return; }
             
@@ -460,10 +456,14 @@
         window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
 
         // =========================================================================
-        // 3. SISTEMA E OTIMIZAÇÃO ORIGINAL
+        // 3. SISTEMA HÍBRIDO E OTIMIZAÇÃO (SEM LIVENESS)
         // =========================================================================
         async function startApp() {
             try {
+                // ATIVAÇÃO DE HARDWARE WEBGL: Previne lentidão transferindo o processamento pesado da CPU para a Placa de Vídeo (GPU)
+                await tf.setBackend('webgl');
+                await tf.ready();
+
                 await auth.signInAnonymously();
                 const MODELS = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js/weights';
                 await faceapi.nets.ssdMobilenetv1.loadFromUri(MODELS); 
