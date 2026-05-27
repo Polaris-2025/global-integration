@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Interação Global | Secure ID</title>
     
-    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
@@ -19,7 +19,7 @@
             --bg-gradient: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
             --bg-card: rgba(255, 255, 255, 0.7);
             --text: #2d3748;
-            --accent: #3b82f6;
+            --accent: #3b82f6; 
             --dark: #1a202c; 
             --danger: #ef4444; 
             --gray-light: #f8fafc;
@@ -362,7 +362,7 @@
         let mySecureId = localStorage.getItem('mySecureId') || null; let myNameLocal = localStorage.getItem('myName') || "Usuário";
 
         // =========================================================================
-        // 2. IA ASSISTENTE DE VOZ NEURAL (CONTROLE TOTAL E INTERNET)
+        // 2. IA ASSISTENTE DE VOZ NEURAL
         // =========================================================================
         function toggleColorblindMode() { document.body.classList.toggle('colorblind-mode'); if(isVoiceActive) speakNeural("Ajuste visual de acessibilidade alterado."); }
 
@@ -384,7 +384,7 @@
         }
 
         function toggleVoiceAI() {
-            if (!speechRecognition) return alert("Navegador incompatível com IA de Voz.");
+            if (!speechRecognition) return Swal.fire({ icon: 'error', title: 'Erro', text: 'Navegador incompatível com IA de Voz.' });
             const btnHome = document.getElementById('voice-home-btn'); const btnRadar = document.getElementById('voice-radar-btn');
             
             if (isVoiceActive) {
@@ -408,21 +408,15 @@
         }
 
         async function processVoiceCommand(command) {
-            console.log("Comando reconhecido: " + command);
-            
             if (command.includes('preencher nome') || command.includes('digitar nome')) {
-                const text = command.split(/nome/)[1].trim(); document.getElementById('user-name').value = text; document.getElementById('edit-name').value = text;
-                speakNeural("Campo nome preenchido com " + text); return;
+                const text = command.split(/nome/)[1].trim(); document.getElementById('user-name').value = text; document.getElementById('edit-name').value = text; speakNeural("Campo nome preenchido com " + text); return;
             }
             if (command.includes('preencher cargo') || command.includes('digitar cargo') || command.includes('preencher bio')) {
-                const text = command.split(/cargo|bio/)[1].trim(); document.getElementById('user-bio').value = text; document.getElementById('edit-bio').value = text;
-                speakNeural("Descrição profissional preenchida."); return;
+                const text = command.split(/cargo|bio/)[1].trim(); document.getElementById('user-bio').value = text; document.getElementById('edit-bio').value = text; speakNeural("Descrição profissional preenchida."); return;
             }
             if (command.includes('preencher link')) {
-                const text = command.split(/link/)[1].trim(); document.getElementById('user-link').value = text; document.getElementById('edit-link').value = text;
-                speakNeural("Link atualizado."); return;
+                const text = command.split(/link/)[1].trim(); document.getElementById('user-link').value = text; document.getElementById('edit-link').value = text; speakNeural("Link atualizado."); return;
             }
-
             if (command.includes('cadastro') || command.includes('novo usuário')) { document.getElementById('btn-novo-cadastro').click(); speakNeural("Iniciando credenciamento."); return; } 
             if (command.includes('entrar no radar') || command.includes('ligar radar')) { document.getElementById('btn-entrar-radar').click(); return; } 
             if (command.includes('voltar') || command.includes('sair do radar') || command.includes('início')) { location.reload(); speakNeural("Retornando ao centro de controle."); return; } 
@@ -438,31 +432,28 @@
             }
             if (command.includes('quem me visualizou') || command.includes('histórico')) { document.getElementById('btn-ver-visualizacoes').click(); speakNeural("Abrindo registros de varredura."); return; }
             if (command.includes('fechar lista') || command.includes('fechar histórico')) { document.getElementById('btn-fechar-lista').click(); speakNeural("Registro recolhido."); return; }
-
             if (command.includes('tudo bem') || command.includes('como você está')) { speakNeural("Sistemas operando com máxima eficiência. Pronta para integrar dados."); return; }
             if (command.includes('quem é você') || command.includes('o que você é')) { speakNeural("Sou a inteligência neural da Interação Global. Fui projetada com arquitetura minimalista para facilitar o acesso à biometria facial, dados seguros e radar em tempo real."); return; }
             
             const questionTrigger = command.match(/(o que é|quem é|quem foi|me explique sobre|fale sobre) (.*)/i);
             if (questionTrigger && questionTrigger[2]) {
-                const query = questionTrigger[2].trim();
-                speakNeural("Analisando a rede global para " + query + ".");
-                const resposta = await conectarNaRedeNeural(query);
-                speakNeural(resposta);
-                return;
+                const query = questionTrigger[2].trim(); speakNeural("Analisando a rede global para " + query + ".");
+                const resposta = await conectarNaRedeNeural(query); speakNeural(resposta); return;
             }
-
             speakNeural("Entrada de voz não processada pelos módulos locais. Diga 'Entrar no radar' ou 'Novo cadastro' para navegar.");
         }
         window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
 
         // =========================================================================
-        // 3. SISTEMA HÍBRIDO E OTIMIZAÇÃO (SEM LIVENESS)
+        // 3. OTIMIZAÇÃO AVANÇADA (ANTI-LAG COM GPU INTERNA DA FACE-API)
         // =========================================================================
         async function startApp() {
             try {
-                // ATIVAÇÃO DE HARDWARE WEBGL: Previne lentidão transferindo o processamento pesado da CPU para a Placa de Vídeo (GPU)
-                await tf.setBackend('webgl');
-                await tf.ready();
+                // Tenta ativar a aceleração WebGL de forma segura (sem conflito de bibliotecas externas)
+                try {
+                    await faceapi.tf.setBackend('webgl');
+                    console.log("Otimização de Hardware (WebGL) ativada com sucesso.");
+                } catch(e) { console.warn("WebGL indisponível. Usando processamento padrão da CPU."); }
 
                 await auth.signInAnonymously();
                 const MODELS = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js/weights';
@@ -497,30 +488,42 @@
         }
 
         // =========================================================================
-        // 4. CADASTRO, AUTENTICAÇÃO E BANCO
+        // 4. CADASTRO, AUTENTICAÇÃO E BANCO (COM TRAVAS DE MEMÓRIA)
         // =========================================================================
         async function monitorCapture() {
             const video = document.getElementById('video-register'); const status = document.getElementById('ia-status');
+            let isDetecting = false; // Trava anti-lag
+
             const interval = setInterval(async () => {
                 if(!document.getElementById('screen-register').classList.contains('active')) { clearInterval(interval); return; }
-                const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-                if (detect) {
-                    const match = findBestMatch(detect.descriptor);
-                    if(match.distance < 0.45) { status.innerText = "Este rosto já possui um cadastro ativo!"; status.style.color = "var(--danger)"; document.getElementById('save-btn').disabled = true; return; }
-                    currentDescriptor = detect.descriptor; status.innerText = "Rosto Mapeado! Finalize o preenchimento."; status.style.color = "#3b82f6"; document.getElementById('save-btn').disabled = false; clearInterval(interval);
+                if(!isDetecting) {
+                    isDetecting = true;
+                    try {
+                        const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+                        if (detect) {
+                            const match = findBestMatch(detect.descriptor);
+                            if(match.distance < 0.45) { 
+                                status.innerText = "Este rosto já possui um cadastro ativo!"; status.style.color = "var(--danger)"; document.getElementById('save-btn').disabled = true; 
+                            } else {
+                                currentDescriptor = detect.descriptor; status.innerText = "Rosto Mapeado! Finalize o preenchimento."; status.style.color = "#3b82f6"; document.getElementById('save-btn').disabled = false; clearInterval(interval);
+                            }
+                        }
+                    } catch(e) { /* frame drop evitado */ }
+                    isDetecting = false;
                 }
-            }, 800);
+            }, 300); // Intervalo reduzido para mais agilidade, mas protegido pela trava
         }
 
         async function saveIdentity() {
             const nome = document.getElementById('user-name').value; const bio = document.getElementById('user-bio').value;
             let link = document.getElementById('user-link').value.trim(); const contact = document.getElementById('user-contact').value;
-            if(!nome) return alert("O Nome é obrigatório.");
+            if(!nome) return Swal.fire({ icon: 'warning', title: 'Atenção', text: 'O Nome é obrigatório.' });
             if(link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
             
             const id = "id_" + Date.now();
             await db.ref('identities/' + id).set({ name: nome, bio: bio, link: link, contact: contact, map: Array.from(currentDescriptor), prefs: { showName: true, showBio: true, showLink: true, showContact: true } });
-            localStorage.setItem('mySecureId', id); localStorage.setItem('myName', nome); alert("Cadastro finalizado."); location.reload();
+            localStorage.setItem('mySecureId', id); localStorage.setItem('myName', nome); 
+            Swal.fire({ icon: 'success', title: 'Pronto!', text: 'Cadastro finalizado.', timer: 2000, showConfirmButton: false }).then(() => location.reload());
         }
 
         async function loadDatabase() {
@@ -544,23 +547,34 @@
 
         async function monitorAuth() {
             const video = document.getElementById('video-auth'); const status = document.getElementById('auth-status');
+            let isDetecting = false; // Trava anti-lag
+
             const interval = setInterval(async () => {
                 if(!document.getElementById('screen-auth').classList.contains('active')) { clearInterval(interval); return; }
-                const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-                if (detect) {
-                    const match = findBestMatch(detect.descriptor);
-                    if (match.distance < 0.45) { 
-                        clearInterval(interval); status.innerText = `Autenticado: ${match.name}`; status.style.color = "#3b82f6";
-                        authTargetId = match.id; localStorage.setItem('mySecureId', match.id); localStorage.setItem('myName', match.name);
-                        setTimeout(() => {
-                            if(currentStream) currentStream.getTracks().forEach(t => t.stop());
-                            if (authAction === 'delete') {
-                                if(confirm(`Excluir permanentemente?`)) { db.ref('identities/' + match.id).remove().then(() => { localStorage.removeItem('mySecureId'); alert("Conta excluída."); location.reload(); }); } else { location.reload(); }
-                            } else if (authAction === 'profile') { openProfileScreen(match); }
-                        }, 1200);
-                    } else { status.innerText = "Rosto não reconhecido."; status.style.color = "var(--danger)"; }
+                if(!isDetecting) {
+                    isDetecting = true;
+                    try {
+                        const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+                        if (detect) {
+                            const match = findBestMatch(detect.descriptor);
+                            if (match.distance < 0.45) { 
+                                clearInterval(interval); status.innerText = `Autenticado: ${match.name}`; status.style.color = "#3b82f6";
+                                authTargetId = match.id; localStorage.setItem('mySecureId', match.id); localStorage.setItem('myName', match.name);
+                                setTimeout(() => {
+                                    if(currentStream) currentStream.getTracks().forEach(t => t.stop());
+                                    if (authAction === 'delete') {
+                                        Swal.fire({ title: 'Tem certeza?', text: 'Excluir a conta permanentemente?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Sim, excluir'
+                                        }).then((result) => {
+                                            if(result.isConfirmed) { db.ref('identities/' + match.id).remove().then(() => { localStorage.removeItem('mySecureId'); Swal.fire('Excluída!', 'Conta deletada.', 'success').then(() => location.reload()); }); } else { location.reload(); }
+                                        });
+                                    } else if (authAction === 'profile') { openProfileScreen(match); }
+                                }, 1200);
+                            } else { status.innerText = "Rosto não reconhecido."; status.style.color = "var(--danger)"; }
+                        }
+                    } catch(e) { /* frame drop evitado */ }
+                    isDetecting = false;
                 }
-            }, 800);
+            }, 300);
         }
 
         // =========================================================================
@@ -584,7 +598,8 @@
                 name: document.getElementById('edit-name').value, bio: document.getElementById('edit-bio').value, link: newLink, contact: document.getElementById('edit-contact').value,
                 prefs: { showName: document.getElementById('pref-name').checked, showBio: document.getElementById('pref-bio').checked, showLink: document.getElementById('pref-link').checked, showContact: document.getElementById('pref-contact').checked }
             });
-            localStorage.setItem('myName', document.getElementById('edit-name').value); alert("Perfil atualizado!"); location.reload();
+            localStorage.setItem('myName', document.getElementById('edit-name').value); 
+            Swal.fire({ icon: 'success', title: 'Sucesso', text: 'Perfil atualizado!', timer: 2000, showConfirmButton: false }).then(() => location.reload());
         }
 
         function loadViewersLog(userId) {
@@ -601,11 +616,14 @@
         }
 
         async function blockUser(viewerIdToBlock) {
-            if(confirm("Bloquear este usuário no Radar?")) { await db.ref('identities/' + authTargetId + '/blocked/' + viewerIdToBlock).set(true); alert("Usuário bloqueado!"); loadViewersLog(authTargetId); }
+            Swal.fire({ title: 'Bloquear usuário?', text: 'Ele não te verá mais no Radar.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, bloquear'
+            }).then(async (result) => {
+                if(result.isConfirmed) { await db.ref('identities/' + authTargetId + '/blocked/' + viewerIdToBlock).set(true); Swal.fire('Bloqueado!', '', 'success'); loadViewersLog(authTargetId); }
+            });
         }
 
         // =========================================================================
-        // 6. RADAR AR E OTIMIZAÇÃO (LINK CLICK GLOBAL)
+        // 6. RADAR AR E OTIMIZAÇÃO (SEM TRAVAMENTO)
         // =========================================================================
         let showRadarNotifications = true;
         function toggleRadarNotifications() { showRadarNotifications = !showRadarNotifications; document.getElementById('live-notifications').style.display = showRadarNotifications ? 'flex' : 'none'; }
@@ -632,6 +650,7 @@
 
             let lastProcessingTime = 0; let loggedViewersThisSession = new Set(); 
             let processingDelay = 200; 
+            let isRadarDetecting = false; // Trava master do Radar
 
             video.addEventListener('play', () => {
                 const dims = { width: video.clientWidth, height: video.clientHeight }; faceapi.matchDimensions(canvas, dims);
@@ -641,63 +660,67 @@
                     
                     const now = Date.now();
                     
-                    if (now - lastProcessingTime > processingDelay) { 
+                    if (now - lastProcessingTime > processingDelay && !isRadarDetecting) { 
+                        isRadarDetecting = true;
                         lastProcessingTime = now;
                         const t0 = performance.now(); 
                         
-                        const detections = await faceapi.detectAllFaces(video, options).withFaceLandmarks().withFaceDescriptors();
-                        const timeTaken = performance.now() - t0;
-                        if(timeTaken > 100) processingDelay = 400; else processingDelay = 150;
+                        try {
+                            const detections = await faceapi.detectAllFaces(video, options).withFaceLandmarks().withFaceDescriptors();
+                            const timeTaken = performance.now() - t0;
+                            if(timeTaken > 100) processingDelay = 400; else processingDelay = 150;
 
-                        const resized = faceapi.resizeResults(detections, dims);
-                        const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        const currentFrameIds = new Set();
-                        
-                        resized.forEach(d => {
-                            const match = findBestMatch(d.descriptor);
-                            const { x, y, width, height } = d.detection.box;
+                            const resized = faceapi.resizeResults(detections, dims);
+                            const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            const currentFrameIds = new Set();
                             
-                            const amIBlocked = match.blocked && mySecureId && match.blocked[mySecureId];
-                            const amILookingAtMyself = (match.id === mySecureId); 
-
-                            if (match.distance < 0.45 && !amIBlocked) {
-                                currentFrameIds.add(match.id);
-
-                                if(!loggedViewersThisSession.has(match.id) && !amILookingAtMyself) {
-                                    loggedViewersThisSession.add(match.id);
-                                    db.ref('identities/' + match.id + '/viewers').push({ viewerId: mySecureId || "anon", viewerName: myNameLocal, time: Date.now() });
-                                }
-
-                                if (isVoiceActive && !announcedFaces.has(match.id) && !amILookingAtMyself) { speakNeural(`Encontrei ${match.name}.`); announcedFaces.add(match.id); setTimeout(() => announcedFaces.delete(match.id), 12000); }
-
-                                ctx.strokeStyle = 'var(--accent)'; ctx.lineWidth = 1.5; ctx.strokeRect(x, y, width, height); 
-
-                                let cardId = `card-${match.id}`; let card = document.getElementById(cardId);
-                                if (!card) {
-                                    card = document.createElement('div'); card.id = cardId; card.className = 'glass-card';
-                                    let innerContent = '';
-                                    if (match.prefs.showName && match.name) innerContent += `<h4>${match.name}</h4>`;
-                                    if (match.prefs.showBio && match.bio) innerContent += `<p>💼 ${match.bio}</p>`;
-                                    if (match.prefs.showContact && match.contact) innerContent += `<p>📞 ${match.contact}</p>`;
-                                    if (match.prefs.showLink && match.link) innerContent += `<p style="color: var(--accent); margin-top:6px;">🔗 Acessar Link Externo</p>`;
-                                    innerContent += `<p class="tap-hint">Tocar para expandir</p>`;
-                                    
-                                    card.innerHTML = innerContent; overlayContainer.appendChild(card);
-                                    
-                                    card.onclick = () => {
-                                        if (match.prefs.showLink && match.link) { window.open(match.link, '_blank');
-                                        } else { alert(`Dados do Radar: \nNome: ${match.name}\nContato: ${match.prefs.showContact ? match.contact : 'Privado'}`); }
-                                    };
-                                }
-                                card.style.left = `${x}px`; card.style.top = `${y + height + 15}px`;
+                            resized.forEach(d => {
+                                const match = findBestMatch(d.descriptor);
+                                const { x, y, width, height } = d.detection.box;
                                 
-                            } else {
-                                ctx.save(); ctx.filter = 'blur(20px)'; ctx.fillStyle = 'rgba(239, 68, 68, 0.85)'; 
-                                const padding = 20; ctx.fillRect(x - padding, y - padding, width + (padding*2), height + (padding*2)); ctx.restore(); 
-                            }
-                        });
-                        
-                        Array.from(overlayContainer.children).forEach(child => { const rawId = child.id.replace('card-', ''); if (!currentFrameIds.has(rawId)) overlayContainer.removeChild(child); });
+                                const amIBlocked = match.blocked && mySecureId && match.blocked[mySecureId];
+                                const amILookingAtMyself = (match.id === mySecureId); 
+
+                                if (match.distance < 0.45 && !amIBlocked) {
+                                    currentFrameIds.add(match.id);
+
+                                    if(!loggedViewersThisSession.has(match.id) && !amILookingAtMyself) {
+                                        loggedViewersThisSession.add(match.id);
+                                        db.ref('identities/' + match.id + '/viewers').push({ viewerId: mySecureId || "anon", viewerName: myNameLocal, time: Date.now() });
+                                    }
+
+                                    if (isVoiceActive && !announcedFaces.has(match.id) && !amILookingAtMyself) { speakNeural(`Encontrei ${match.name}.`); announcedFaces.add(match.id); setTimeout(() => announcedFaces.delete(match.id), 12000); }
+
+                                    ctx.strokeStyle = 'var(--accent)'; ctx.lineWidth = 1.5; ctx.strokeRect(x, y, width, height); 
+
+                                    let cardId = `card-${match.id}`; let card = document.getElementById(cardId);
+                                    if (!card) {
+                                        card = document.createElement('div'); card.id = cardId; card.className = 'glass-card';
+                                        let innerContent = '';
+                                        if (match.prefs.showName && match.name) innerContent += `<h4>${match.name}</h4>`;
+                                        if (match.prefs.showBio && match.bio) innerContent += `<p>💼 ${match.bio}</p>`;
+                                        if (match.prefs.showContact && match.contact) innerContent += `<p>📞 ${match.contact}</p>`;
+                                        if (match.prefs.showLink && match.link) innerContent += `<p style="color: var(--accent); margin-top:6px;">🔗 Acessar Link Externo</p>`;
+                                        innerContent += `<p class="tap-hint">Tocar para expandir</p>`;
+                                        
+                                        card.innerHTML = innerContent; overlayContainer.appendChild(card);
+                                        
+                                        card.onclick = () => {
+                                            if (match.prefs.showLink && match.link) { window.open(match.link, '_blank');
+                                            } else { Swal.fire({ title: match.name, text: match.prefs.showContact ? match.contact : 'Contato Privado', icon: 'info' }); }
+                                        };
+                                    }
+                                    card.style.left = `${x}px`; card.style.top = `${y + height + 15}px`;
+                                    
+                                } else {
+                                    ctx.save(); ctx.filter = 'blur(20px)'; ctx.fillStyle = 'rgba(239, 68, 68, 0.85)'; 
+                                    const padding = 20; ctx.fillRect(x - padding, y - padding, width + (padding*2), height + (padding*2)); ctx.restore(); 
+                                }
+                            });
+                            
+                            Array.from(overlayContainer.children).forEach(child => { const rawId = child.id.replace('card-', ''); if (!currentFrameIds.has(rawId)) overlayContainer.removeChild(child); });
+                        } catch(e) { /* frame drop evitado silenciosamente */ }
+                        isRadarDetecting = false;
                     }
                     requestAnimationFrame(processFrame); 
                 };
