@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+<head><!DOCTYPE html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Interação Global | Secure ID</title>
+    <title> IG | Secure ID</title>
     
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.11.0/dist/tf.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -18,31 +21,30 @@
             --bg-gradient: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
             --bg-card: rgba(255, 255, 255, 0.7);
             --text: #2d3748;
-            --accent: #3b82f6; /* Azul suave e moderno */
-            --dark: #1a202c; /* Cinza muito escuro em vez de preto puro */
-            --danger: #ef4444; /* Vermelho limpo */
+            --accent: #3b82f6;
+            --dark: #1a202c;
+            --danger: #ef4444;
+            --warning: #d97706;
             --gray-light: #f8fafc;
             --border: #e2e8f0;
         }
 
         body.colorblind-mode {
             --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            --accent: #d97706; /* Laranja seguro */
-            --danger: #4f46e5; /* Índigo seguro */
+            --accent: #d97706; 
+            --danger: #4f46e5; 
         }
 
         body, html {
             margin: 0; padding: 0;
             background: var(--bg-gradient);
             color: var(--text);
-            /* Fontes modernas sem serifa, mais finas */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             height: 100vh;
             overflow: hidden;
             transition: background 0.4s ease, color 0.4s ease;
         }
 
-        /* Removendo negritos e deixando textos minimalistas */
         h2, h3, h4, h5 { font-weight: 300; letter-spacing: 0.5px; margin: 0; }
         p, span, label { font-weight: 300; }
 
@@ -58,8 +60,7 @@
 
         .btn {
             background: var(--dark); color: #fff; border: none; padding: 14px 28px;
-            border-radius: 30px; /* Bordas arredondadas suaves */
-            font-size: 14px; font-weight: 400; cursor: pointer;
+            border-radius: 30px; font-size: 14px; font-weight: 400; cursor: pointer;
             width: 280px; margin: 6px 0; transition: all 0.3s ease;
         }
         .btn:hover { background: var(--accent); transform: translateY(-1px); box-shadow: 0 8px 15px rgba(59, 130, 246, 0.2); }
@@ -86,7 +87,7 @@
         .checkbox-container label { display: flex; align-items: center; margin-bottom: 12px; cursor: pointer; color: var(--text);}
         .checkbox-container input { margin-right: 12px; transform: scale(1.1); cursor: pointer; accent-color: var(--accent); }
 
-        /* === MODAIS (FLUTUANTES) === */
+        /* === MODAIS === */
         .modal-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.2); z-index: 100; display: none; justify-content: center; align-items: center; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
         .modal-card { background: rgba(255, 255, 255, 0.85); width: 85%; max-width: 400px; padding: 30px; border-radius: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5); }
         .modal-scroll-box { height: 250px; overflow-y: auto; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 15px 0; margin-bottom: 20px; font-size: 13px; line-height: 1.6; color: var(--text); scrollbar-width: thin;}
@@ -98,7 +99,6 @@
         #canvas-ar { position: absolute; top: 0; left: 0; pointer-events: none; }
         #html-overlay-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden; }
 
-        /* === DESIGN DO RADAR E CAIXAS CLICÁVEIS (GLASSMORPHISM MINIMALISTA) === */
         .glass-card {
             position: absolute; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 16px; padding: 15px 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
@@ -111,13 +111,20 @@
 
         /* === UI E ACESSIBILIDADE === */
         .top-bar-ui { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 9999; pointer-events: none;}
-        .accessibility-bar { display: flex; gap: 10px; pointer-events: auto; }
+        .language-selector { background: rgba(255,255,255,0.5); color: var(--dark); border: 1px solid rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 300; outline: none; pointer-events: auto; backdrop-filter: blur(10px);}
+        
+        .accessibility-dropdown { position: relative; display: inline-block; pointer-events: auto; }
         .btn-mini { background: rgba(255, 255, 255, 0.5); color: var(--dark); border: 1px solid rgba(255,255,255,0.8); backdrop-filter: blur(10px); padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 400; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 10px rgba(0,0,0,0.02);}
         .btn-mini:hover { background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .accessibility-content { display: none; position: absolute; right: 0; margin-top: 8px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); min-width: 130px; box-shadow: 0px 10px 30px rgba(0,0,0,0.1); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+        .accessibility-dropdown:hover .accessibility-content { display: block; animation: fadeIn 0.3s ease; }
+        .accessibility-content button { width: 100%; text-align: left; background: none; border: none; padding: 12px 16px; font-size: 12px; color: var(--text); cursor: pointer; transition: 0.2s; border-bottom: 1px solid rgba(0,0,0,0.03); }
+        .accessibility-content button:hover { background: var(--gray-light); color: var(--accent); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         
-        .language-selector { background: rgba(255,255,255,0.5); color: var(--dark); border: 1px solid rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 300; outline: none; pointer-events: auto; backdrop-filter: blur(10px);}
+        [vw-access-button] { display: none !important; }
 
-        /* === ORBE ASSISTENTE DE VOZ NEURAL (ANIMAÇÃO EM REDE) === */
+        /* === ORBE ASSISTENTE DE VOZ === */
         .voice-orb-container { margin: 30px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto; }
         .voice-orb {
             width: 80px; height: 80px; border-radius: 50%; cursor: pointer; position: relative;
@@ -134,16 +141,13 @@
         .voice-active .voice-orb::after { animation: orbNet 2s infinite 1s linear; border: 1px dashed rgba(239, 68, 68, 0.4); }
         @keyframes orbNet { 0% { width: 100%; height: 100%; opacity: 1; transform: translate(-50%, -50%) rotate(0deg); } 100% { width: 200%; height: 200%; opacity: 0; transform: translate(-50%, -50%) rotate(180deg); } }
         .orb-label { font-size: 11px; font-weight: 300; color: #64748b; margin-top: 15px; letter-spacing: 2px; text-transform: uppercase; }
-
-        /* Orbe Flutuante no Radar */
         .voice-radar-float { position: absolute; top: 80px; right: 20px; z-index: 9999; transform: scale(0.65); margin: 0; }
 
-        /* === ZOOM CONTROL === */
+        /* === ZOOM E NOTIFICAÇÕES === */
         .zoom-container { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; z-index: 5; background: rgba(255,255,255,0.4); padding: 15px 8px; border-radius: 30px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.3);}
         .zoom-slider { appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 3px; height: 120px; outline: none; background: rgba(0,0,0,0.1); border-radius: 5px; cursor: pointer; accent-color: var(--dark);}
         .zoom-icon { color: var(--dark); font-size: 14px; font-weight: 300; margin: 10px 0; }
-
-        /* === NOTIFICAÇÕES E LISTA DO PERFIL === */
+        
         .radar-notifications-panel { position: absolute; top: 80px; left: 20px; z-index: 5; display: flex; flex-direction: column; gap: 10px; max-width: 250px; pointer-events: none;}
         .radar-toast { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); border-left: 2px solid var(--accent); border-radius: 12px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); font-size: 12px; animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .radar-toast strong { font-size: 13px; color: var(--dark); display: block; margin-bottom: 2px;}
@@ -166,9 +170,13 @@
             <option value="en">EN-US</option>
             <option value="es">ES</option>
         </select>
-        <div class="accessibility-bar">
-            <button class="btn-mini" onclick="document.querySelector('[vw-access-button]').click();">Libras</button>
-            <button class="btn-mini" onclick="toggleColorblindMode()" data-i18n="btn_colorblind">Daltônicos</button>
+        
+        <div class="accessibility-dropdown">
+            <button class="btn-mini" data-i18n="btn_accessibility">Acessibilidade ▼</button>
+            <div class="accessibility-content">
+                <button onclick="document.querySelector('[vw-access-button]').click();">Libras</button>
+                <button onclick="toggleColorblindMode()" data-i18n="btn_colorblind">Daltônicos</button>
+            </div>
         </div>
     </div>
 
@@ -176,15 +184,12 @@
         <div class="logo-area">
             <h2 data-i18n="app_title">Interação Global</h2>
         </div>
-
         <div class="voice-orb-container" id="voice-home-btn" onclick="toggleVoiceAI()">
             <div class="voice-orb"></div>
             <div class="orb-label" data-i18n="orb_label">Assistente de Voz</div>
         </div>
-
         <button class="btn" id="btn-novo-cadastro" onclick="openLGPD()" data-i18n="btn_register">Novo Cadastro</button>
         <button class="btn btn-outline" id="btn-entrar-radar" onclick="startRadarView()" data-i18n="btn_radar">Entrar no Radar</button> 
-        
         <div style="margin-top: 50px; border-top: 1px solid var(--border); padding-top: 25px; width: 280px; text-align: center;">
             <p style="font-size: 11px; color: #94a3b8; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase;" data-i18n="lbl_manage">Gerenciar Conta</p>
             <button class="btn btn-outline" id="btn-meu-perfil" style="padding: 14px; width: 100%; margin-bottom: 10px; border-radius: 30px;" onclick="startAuthFlow('profile')" data-i18n="btn_profile">Meu Perfil</button>
@@ -216,7 +221,7 @@
 
     <div id="screen-register" class="screen">
         <div class="cam-box"><video id="video-register" autoplay muted playsinline></video></div>
-        <div id="ia-status" style="font-size: 13px; color: var(--accent); margin-bottom: 15px;" data-i18n="status_waiting">Aguardando alinhamento facial...</div>
+        <div id="ia-status" style="font-size: 13px; color: var(--accent); margin-bottom: 15px; font-weight: 500;" data-i18n="status_waiting">Aguardando alinhamento facial...</div>
         
         <div class="form-container">
             <input type="text" id="user-name" class="input-modern" placeholder="Nome Completo *">
@@ -232,13 +237,12 @@
     <div id="screen-auth" class="screen">
         <h3 id="auth-title" style="margin-bottom: 30px; font-size: 20px; color: var(--dark);">Autenticação</h3>
         <div class="cam-box"><video id="video-auth" autoplay muted playsinline></video></div>
-        <div id="auth-status" style="font-size: 13px; color: var(--accent); margin-bottom: 15px;" data-i18n="status_scanning">Analisando biometria...</div>
+        <div id="auth-status" style="font-size: 13px; color: var(--accent); margin-bottom: 15px; font-weight: 500;" data-i18n="status_scanning">Analisando biometria...</div>
         <button class="btn btn-outline" style="margin-top: 15px; border-color: transparent;" onclick="location.reload()" data-i18n="btn_cancel">Cancelar</button>
     </div>
 
     <div id="screen-profile" class="screen">
         <h3 style="margin-bottom: 20px; font-size: 22px; color: var(--dark);" data-i18n="btn_profile">Meu Perfil</h3>
-        
         <div class="form-container" style="max-height: 55vh; width: 100%;">
             <input type="text" id="edit-name" class="input-modern" placeholder="Nome Completo">
             <input type="text" id="edit-bio" class="input-modern" placeholder="Cargo / Descrição">
@@ -252,10 +256,8 @@
                 <label><input type="checkbox" id="pref-link"> <span data-i18n="chk_link">Mostrar Link</span></label>
                 <label><input type="checkbox" id="pref-contact" style="margin-bottom: 0;"> <span data-i18n="chk_contact">Mostrar Contato</span></label>
             </div>
-            
             <button class="btn btn-outline" id="btn-ver-visualizacoes" style="font-size: 13px; border: 1px solid var(--border); color: var(--text); width: 280px; padding: 14px; margin-top: 10px;" onclick="openViewersModal()">👁️ <span data-i18n="btn_see_viewers">Ver histórico de visualizações</span></button>
         </div>
-        
         <button class="btn" id="btn-salvar-perfil" style="margin-top: 15px;" onclick="saveProfileChanges()" data-i18n="btn_save_changes">Salvar Alterações</button>
         <button class="btn btn-outline" style="margin-top: 10px; border-color: transparent;" onclick="location.reload()" data-i18n="btn_exit_profile">Sair do Perfil</button>
     </div>
@@ -293,33 +295,33 @@
         // =========================================================================
         const translations = {
             pt: {
-                app_title: "Interação Global", btn_colorblind: "Daltônicos", orb_label: "Assistente de Voz", btn_register: "Novo Cadastro",
+                app_title: "Interação Global", btn_colorblind: "Daltônicos", btn_accessibility: "Acessibilidade ▼", orb_label: "Assistente de Voz", btn_register: "Novo Cadastro",
                 btn_radar: "Entrar no Radar", lbl_manage: "Gerenciar Conta", btn_profile: "Meu Perfil",
                 btn_delete: "Excluir Cadastro", title_privacy: "Privacidade de Dados", btn_accept: "Aceitar e Continuar",
                 btn_cancel: "Cancelar", title_viewers: "Histórico do Radar", text_no_viewers: "Nenhum registro encontrado.",
-                btn_close: "Fechar Aba", status_waiting: "Aguardando alinhamento facial...", btn_finish_reg: "Finalizar Registro",
+                btn_close: "Fechar Aba", status_waiting: "Aguardando alinhamento facial...", status_blink: "Piscar os olhos para confirmar que é real...", btn_finish_reg: "Finalizar Registro",
                 btn_back: "Voltar", status_scanning: "Analisando biometria...", lbl_show_radar: "O que mostrar no Radar?",
                 chk_name: "Mostrar Nome", chk_bio: "Mostrar Bio", chk_link: "Mostrar Link", chk_contact: "Mostrar Contato",
                 btn_see_viewers: "Ver histórico de visualizações", btn_save_changes: "Salvar Alterações", btn_exit_profile: "Sair do Perfil",
                 btn_toggle_alerts: "Ocultar Avisos", btn_switch_cam: "Trocar Câmera", btn_exit_radar: "Desconectar Radar"
             },
             en: {
-                app_title: "Global Interation", btn_colorblind: "Colorblind", orb_label: "Voice Assistant", btn_register: "New Registration",
+                app_title: "Global Interation", btn_colorblind: "Colorblind", btn_accessibility: "Accessibility ▼", orb_label: "Voice Assistant", btn_register: "New Registration",
                 btn_radar: "Enter Radar", lbl_manage: "Manage Account", btn_profile: "My Profile",
                 btn_delete: "Delete Account", title_privacy: "Data Privacy", btn_accept: "Accept and Continue",
                 btn_cancel: "Cancel", title_viewers: "Radar History", text_no_viewers: "No records found.",
-                btn_close: "Close Tab", status_waiting: "Waiting for facial alignment...", btn_finish_reg: "Finish Registration",
+                btn_close: "Close Tab", status_waiting: "Waiting for facial alignment...", status_blink: "Blink your eyes to confirm liveness...", btn_finish_reg: "Finish Registration",
                 btn_back: "Back", status_scanning: "Analyzing biometrics...", lbl_show_radar: "What to show on Radar?",
                 chk_name: "Show Name", chk_bio: "Show Bio", chk_link: "Show Link", chk_contact: "Show Contact",
                 btn_see_viewers: "View view history", btn_save_changes: "Save Changes", btn_exit_profile: "Exit Profile",
                 btn_toggle_alerts: "Toggle Alerts", btn_switch_cam: "Switch Camera", btn_exit_radar: "Disconnect Radar"
             },
             es: {
-                app_title: "Interacción Global", btn_colorblind: "Daltónicos", orb_label: "Asistente de Voz", btn_register: "Nuevo Registro",
+                app_title: "Interacción Global", btn_colorblind: "Daltónicos", btn_accessibility: "Accesibilidad ▼", orb_label: "Asistente de Voz", btn_register: "Nuevo Registro",
                 btn_radar: "Entrar al Radar", lbl_manage: "Gestionar Cuenta", btn_profile: "Mi Perfil",
                 btn_delete: "Eliminar Cuenta", title_privacy: "Privacidad de Datos", btn_accept: "Aceptar y Continuar",
                 btn_cancel: "Cancelar", title_viewers: "Historial del Radar", text_no_viewers: "No se encontraron registros.",
-                btn_close: "Cerrar", status_waiting: "Esperando alineación facial...", btn_finish_reg: "Finalizar Registro",
+                btn_close: "Cerrar", status_waiting: "Esperando alineación facial...", status_blink: "Parpadea para confirmar que eres real...", btn_finish_reg: "Finalizar Registro",
                 btn_back: "Volver", status_scanning: "Analizando biometría...", lbl_show_radar: "¿Qué mostrar en Radar?",
                 chk_name: "Mostrar Nombre", chk_bio: "Mostrar Bio", chk_link: "Mostrar Enlace", chk_contact: "Mostrar Contacto",
                 btn_see_viewers: "Ver historial de vistas", btn_save_changes: "Guardar Cambios", btn_exit_profile: "Salir del Perfil",
@@ -354,7 +356,7 @@
         let mySecureId = localStorage.getItem('mySecureId') || null; let myNameLocal = localStorage.getItem('myName') || "Usuário";
 
         // =========================================================================
-        // 2. IA ASSISTENTE DE VOZ NEURAL (CONTROLE TOTAL E INTERNET)
+        // 2. IA ASSISTENTE DE VOZ NEURAL
         // =========================================================================
         function toggleColorblindMode() { document.body.classList.toggle('colorblind-mode'); if(isVoiceActive) speakNeural("Ajuste visual de acessibilidade alterado."); }
 
@@ -390,10 +392,7 @@
             }
         }
 
-        // --- NÚCLEO DA IA: CONTROLE DO SITE E CONEXÃO EXTERNA ---
         async function conectarNaRedeNeural(pergunta) {
-            // A API Pública da Wikipedia garante que o TG responda a perguntas complexas em tempo real sem custo.
-            // Quando tiver a API de uma LLM, você substitui aqui dentro.
             try {
                 const res = await fetch(`https://pt.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pergunta)}`);
                 const data = await res.json();
@@ -403,23 +402,15 @@
         }
 
         async function processVoiceCommand(command) {
-            console.log("Comando reconhecido: " + command);
-            
-            // LÓGICA DE PREENCHIMENTO DE FORMULÁRIO (DIGITAÇÃO POR VOZ)
             if (command.includes('preencher nome') || command.includes('digitar nome')) {
-                const text = command.split(/nome/)[1].trim(); document.getElementById('user-name').value = text; document.getElementById('edit-name').value = text;
-                speakNeural("Campo nome preenchido com " + text); return;
+                const text = command.split(/nome/)[1].trim(); document.getElementById('user-name').value = text; document.getElementById('edit-name').value = text; speakNeural("Campo nome preenchido com " + text); return;
             }
             if (command.includes('preencher cargo') || command.includes('digitar cargo') || command.includes('preencher bio')) {
-                const text = command.split(/cargo|bio/)[1].trim(); document.getElementById('user-bio').value = text; document.getElementById('edit-bio').value = text;
-                speakNeural("Descrição profissional preenchida."); return;
+                const text = command.split(/cargo|bio/)[1].trim(); document.getElementById('user-bio').value = text; document.getElementById('edit-bio').value = text; speakNeural("Descrição profissional preenchida."); return;
             }
             if (command.includes('preencher link')) {
-                const text = command.split(/link/)[1].trim(); document.getElementById('user-link').value = text; document.getElementById('edit-link').value = text;
-                speakNeural("Link atualizado."); return;
+                const text = command.split(/link/)[1].trim(); document.getElementById('user-link').value = text; document.getElementById('edit-link').value = text; speakNeural("Link atualizado."); return;
             }
-
-            // LÓGICA DE CLIQUE EM BOTÕES (CONTROLE TOTAL)
             if (command.includes('cadastro') || command.includes('novo usuário')) { document.getElementById('btn-novo-cadastro').click(); speakNeural("Iniciando credenciamento."); return; } 
             if (command.includes('entrar no radar') || command.includes('ligar radar')) { document.getElementById('btn-entrar-radar').click(); return; } 
             if (command.includes('voltar') || command.includes('sair do radar') || command.includes('início')) { location.reload(); speakNeural("Retornando ao centro de controle."); return; } 
@@ -435,29 +426,27 @@
             }
             if (command.includes('quem me visualizou') || command.includes('histórico')) { document.getElementById('btn-ver-visualizacoes').click(); speakNeural("Abrindo registros de varredura."); return; }
             if (command.includes('fechar lista') || command.includes('fechar histórico')) { document.getElementById('btn-fechar-lista').click(); speakNeural("Registro recolhido."); return; }
-
-            // CHAT BOT INTELIGENTE
             if (command.includes('tudo bem') || command.includes('como você está')) { speakNeural("Sistemas operando com máxima eficiência. Pronta para integrar dados."); return; }
             if (command.includes('quem é você') || command.includes('o que você é')) { speakNeural("Sou a inteligência neural da Interação Global. Fui projetada com arquitetura minimalista para facilitar o acesso à biometria facial, dados seguros e radar em tempo real."); return; }
             
             const questionTrigger = command.match(/(o que é|quem é|quem foi|me explique sobre|fale sobre) (.*)/i);
             if (questionTrigger && questionTrigger[2]) {
-                const query = questionTrigger[2].trim();
-                speakNeural("Analisando a rede global para " + query + ".");
-                const resposta = await conectarNaRedeNeural(query);
-                speakNeural(resposta);
-                return;
+                const query = questionTrigger[2].trim(); speakNeural("Analisando a rede global para " + query + ".");
+                const resposta = await conectarNaRedeNeural(query); speakNeural(resposta); return;
             }
-
             speakNeural("Entrada de voz não processada pelos módulos locais. Diga 'Entrar no radar' ou 'Novo cadastro' para navegar.");
         }
         window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
 
         // =========================================================================
-        // 3. SISTEMA HÍBRIDO E OTIMIZAÇÃO (ANTI-LAG)
+        // 3. SISTEMA HÍBRIDO E LIVENESS DETECTION (ANTI-LAG)
         // =========================================================================
         async function startApp() {
             try {
+                // ATIVAÇÃO DE HARDWARE WEBGL: Previne travamentos transferindo o peso para a GPU
+                await tf.setBackend('webgl');
+                await tf.ready();
+                
                 await auth.signInAnonymously();
                 const MODELS = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js/weights';
                 await faceapi.nets.ssdMobilenetv1.loadFromUri(MODELS); 
@@ -466,6 +455,15 @@
                 loadDatabase();
                 if(mySecureId) listenToRadarNotifications();
             } catch (e) { console.error("Erro ao carregar IA:", e); }
+        }
+
+        // Função Matemática para Prova de Vida 2D
+        function calculateEAR(eye) {
+            const euclideanDist = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+            const v1 = euclideanDist(eye[1], eye[5]);
+            const v2 = euclideanDist(eye[2], eye[4]);
+            const h = euclideanDist(eye[0], eye[3]);
+            return (v1 + v2) / (2.0 * h);
         }
 
         function openLGPD() { document.getElementById('lgpd-modal').style.display = 'flex'; }
@@ -480,8 +478,7 @@
             document.getElementById(id).srcObject = currentStream;
 
             if(id === 'video-radar') {
-                const track = currentStream.getVideoTracks()[0];
-                const capabilities = track.getCapabilities();
+                const track = currentStream.getVideoTracks()[0]; const capabilities = track.getCapabilities();
                 if (capabilities.zoom) {
                     const slider = document.getElementById('camera-zoom'); document.getElementById('zoom-controls').style.display = 'flex';
                     slider.min = capabilities.zoom.min; slider.max = capabilities.zoom.max; slider.step = capabilities.zoom.step; slider.value = track.getSettings().zoom || 1;
@@ -491,19 +488,61 @@
         }
 
         // =========================================================================
-        // 4. CADASTRO, AUTENTICAÇÃO E BANCO
+        // 4. CADASTRO, AUTENTICAÇÃO SEGURA (C/ PISCAR OTIMIZADO) E BANCO
         // =========================================================================
         async function monitorCapture() {
-            const video = document.getElementById('video-register'); const status = document.getElementById('ia-status');
-            const interval = setInterval(async () => {
-                if(!document.getElementById('screen-register').classList.contains('active')) { clearInterval(interval); return; }
-                const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-                if (detect) {
-                    const match = findBestMatch(detect.descriptor);
-                    if(match.distance < 0.45) { status.innerText = "Este rosto já possui um cadastro ativo!"; status.style.color = "var(--danger)"; document.getElementById('save-btn').disabled = true; return; }
-                    currentDescriptor = detect.descriptor; status.innerText = "Rosto Mapeado! Finalize o preenchimento."; status.style.color = "#3b82f6"; document.getElementById('save-btn').disabled = false; clearInterval(interval);
+            const video = document.getElementById('video-register'); 
+            const status = document.getElementById('ia-status');
+            
+            let blinkDetected = false;
+            let earHistory = []; // Buffer para guardar o histórico das pálpebras
+            let isDetecting = false; // Flag para impedir sobreposição de frames (Anti-Lag)
+
+            const processFrame = async () => {
+                if(!document.getElementById('screen-register').classList.contains('active')) return;
+                
+                if (!isDetecting) {
+                    isDetecting = true;
+                    try {
+                        const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+                        if (detect) {
+                            const leftEye = detect.landmarks.getLeftEye(); 
+                            const rightEye = detect.landmarks.getRightEye();
+                            const ear = (calculateEAR(leftEye) + calculateEAR(rightEye)) / 2;
+                            
+                            // Adiciona o valor atual no buffer
+                            earHistory.push(ear);
+                            if (earHistory.length > 10) earHistory.shift();
+
+                            // Procura o padrão de piscar (queda rápida na distância dos olhos)
+                            if (!blinkDetected && earHistory.length === 10) {
+                                const minEar = Math.min(...earHistory);
+                                const maxEar = Math.max(...earHistory);
+                                // Se houver uma variação visível indicando que o olho fechou e abriu
+                                if (maxEar - minEar > 0.05 && minEar < 0.28) {
+                                    blinkDetected = true;
+                                }
+                            }
+
+                            if (!blinkDetected) {
+                                status.innerText = translations[document.getElementById('lang-select').value]['status_blink'] || "Piscar os olhos para confirmar que é real...";
+                                status.style.color = "var(--warning)"; document.getElementById('save-btn').disabled = true;
+                            } else {
+                                const match = findBestMatch(detect.descriptor);
+                                if(match.distance < 0.45) { 
+                                    status.innerText = "Este rosto já possui um cadastro ativo!"; status.style.color = "var(--danger)"; document.getElementById('save-btn').disabled = true; 
+                                } else {
+                                    currentDescriptor = detect.descriptor; status.innerText = "Rosto e Vida Mapeados! Preencha os dados."; status.style.color = "#3b82f6"; document.getElementById('save-btn').disabled = false; 
+                                    return; // Para o loop pois teve sucesso
+                                }
+                            }
+                        }
+                    } catch(e) { console.warn("Frame drop evitado."); }
+                    isDetecting = false;
                 }
-            }, 800);
+                requestAnimationFrame(processFrame); // Pede o próximo frame apenas quando o atual terminar
+            };
+            processFrame();
         }
 
         async function saveIdentity() {
@@ -537,24 +576,61 @@
         }
 
         async function monitorAuth() {
-            const video = document.getElementById('video-auth'); const status = document.getElementById('auth-status');
-            const interval = setInterval(async () => {
-                if(!document.getElementById('screen-auth').classList.contains('active')) { clearInterval(interval); return; }
-                const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-                if (detect) {
-                    const match = findBestMatch(detect.descriptor);
-                    if (match.distance < 0.45) { 
-                        clearInterval(interval); status.innerText = `Autenticado: ${match.name}`; status.style.color = "#3b82f6";
-                        authTargetId = match.id; localStorage.setItem('mySecureId', match.id); localStorage.setItem('myName', match.name);
-                        setTimeout(() => {
-                            if(currentStream) currentStream.getTracks().forEach(t => t.stop());
-                            if (authAction === 'delete') {
-                                if(confirm(`Excluir permanentemente?`)) { db.ref('identities/' + match.id).remove().then(() => { localStorage.removeItem('mySecureId'); alert("Conta excluída."); location.reload(); }); } else { location.reload(); }
-                            } else if (authAction === 'profile') { openProfileScreen(match); }
-                        }, 1200);
-                    } else { status.innerText = "Rosto não reconhecido."; status.style.color = "var(--danger)"; }
+            const video = document.getElementById('video-auth'); 
+            const status = document.getElementById('auth-status');
+            
+            let blinkDetected = false;
+            let earHistory = [];
+            let isDetecting = false;
+
+            const processFrame = async () => {
+                if(!document.getElementById('screen-auth').classList.contains('active')) return;
+                
+                if (!isDetecting) {
+                    isDetecting = true;
+                    try {
+                        const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+                        if (detect) {
+                            const match = findBestMatch(detect.descriptor);
+                            if (match.distance < 0.45) { 
+                                
+                                const leftEye = detect.landmarks.getLeftEye(); 
+                                const rightEye = detect.landmarks.getRightEye();
+                                const ear = (calculateEAR(leftEye) + calculateEAR(rightEye)) / 2;
+                                
+                                earHistory.push(ear);
+                                if (earHistory.length > 10) earHistory.shift();
+
+                                if (!blinkDetected && earHistory.length === 10) {
+                                    const minEar = Math.min(...earHistory);
+                                    const maxEar = Math.max(...earHistory);
+                                    if (maxEar - minEar > 0.05 && minEar < 0.28) {
+                                        blinkDetected = true;
+                                    }
+                                }
+
+                                if (!blinkDetected) {
+                                    status.innerText = translations[document.getElementById('lang-select').value]['status_blink'] || "Piscar os olhos para confirmar que é real...";
+                                    status.style.color = "var(--warning)";
+                                } else {
+                                    status.innerText = `Autenticado: ${match.name}`; status.style.color = "#3b82f6";
+                                    authTargetId = match.id; localStorage.setItem('mySecureId', match.id); localStorage.setItem('myName', match.name);
+                                    setTimeout(() => {
+                                        if(currentStream) currentStream.getTracks().forEach(t => t.stop());
+                                        if (authAction === 'delete') {
+                                            if(confirm(`Excluir permanentemente?`)) { db.ref('identities/' + match.id).remove().then(() => { localStorage.removeItem('mySecureId'); alert("Conta excluída."); location.reload(); }); } else { location.reload(); }
+                                        } else if (authAction === 'profile') { openProfileScreen(match); }
+                                    }, 1200);
+                                    return; // Sucesso, para o loop
+                                }
+                            } else { status.innerText = "Rosto não reconhecido."; status.style.color = "var(--danger)"; }
+                        }
+                    } catch(e) { console.warn("Frame drop evitado."); }
+                    isDetecting = false;
                 }
-            }, 800);
+                requestAnimationFrame(processFrame);
+            };
+            processFrame();
         }
 
         // =========================================================================
@@ -599,7 +675,7 @@
         }
 
         // =========================================================================
-        // 6. RADAR AR E OTIMIZAÇÃO (LINK CLICK GLOBAL)
+        // 6. RADAR AR E OTIMIZAÇÃO
         // =========================================================================
         let showRadarNotifications = true;
         function toggleRadarNotifications() { showRadarNotifications = !showRadarNotifications; document.getElementById('live-notifications').style.display = showRadarNotifications ? 'flex' : 'none'; }
@@ -634,7 +710,6 @@
                     if(video.paused || video.ended || !document.getElementById('screen-radar').classList.contains('active')) return;
                     
                     const now = Date.now();
-                    
                     if (now - lastProcessingTime > processingDelay) { 
                         lastProcessingTime = now;
                         const t0 = performance.now(); 
@@ -701,4 +776,3 @@
         startApp();
     </script>
 </body>
-</html>
