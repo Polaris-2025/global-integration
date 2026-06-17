@@ -13,6 +13,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
 
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
     <style>
         /* === VARIÁVEIS DE CORES (MODERNO/MINIMALISTA SUAVE) === */
         :root {
@@ -36,23 +38,10 @@
             --gray-light: #374151;
         }
 
-        /* Correção dos botões no Modo Escuro */
-        body.dark-mode .btn {
-            background: var(--accent);
-            color: #ffffff;
-        }
-        body.dark-mode .btn:hover {
-            background: #2563eb;
-        }
-        body.dark-mode .btn-outline {
-            background: transparent;
-            color: var(--text);
-        }
-        body.dark-mode .btn-outline:hover {
-            background: var(--bg-card);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+        body.dark-mode .btn { background: var(--accent); color: #ffffff; }
+        body.dark-mode .btn:hover { background: #2563eb; }
+        body.dark-mode .btn-outline { background: transparent; color: var(--text); }
+        body.dark-mode .btn-outline:hover { background: var(--bg-card); border-color: var(--accent); color: var(--accent); }
 
         body.colorblind-mode {
             --bg-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
@@ -79,6 +68,20 @@
             z-index: 10;
         }
         .active { display: flex; }
+
+        /* TELA DE CARREGAMENTO GLOBAL */
+        #global-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-gradient); z-index: 100000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid var(--border);
+            border-top: 3px solid var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 15px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .btn {
             background: var(--dark); color: #fff; border: none; padding: 14px 28px;
@@ -121,29 +124,26 @@
         #radar-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #000; overflow: hidden; }
         #canvas-ar { position: absolute; top: 0; left: 0; pointer-events: none; }
         
-        /* ADIÇÃO DO PERSPECTIVE NO CONTAINER PARA ROTAÇÕES 3D FUNCIONAREM */
         #html-overlay-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; }
 
         .glass-card {
             position: absolute; background: var(--bg-card); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border); border-radius: 16px; padding: 15px 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            min-width: 180px; pointer-events: auto; cursor: pointer; transition: transform 0.3s ease, background 0.3s ease; color: var(--text);
+            min-width: 180px; pointer-events: auto; cursor: pointer; transition: background 0.3s ease; color: var(--text);
+            will-change: transform, left, top;
         }
         .glass-card:hover { border-color: var(--accent); }
         .glass-card h4 { margin: 0 0 6px 0; font-size: 16px; color: var(--dark); font-weight: 400; }
         .glass-card p { margin: 3px 0; font-size: 13px; color: var(--text); display: flex; align-items: center; opacity: 0.8;}
         .glass-card p.tap-hint { font-size: 10px; color: var(--accent); margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
 
-        /* AR GLOBAL ITEM STYLES */
         .ar-item-card { 
             border-color: #10b981; 
-            /* Transição muito rápida e suave apenas para opacidade, o transform será manual no JS */
             transition: opacity 0.3s;
             transform-style: preserve-3d;
             backface-visibility: visible;
         }
 
-        /* Estilização para o painel de controles dos Sliders de edição */
         .ar-slider-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text); margin-bottom: 8px;}
         .ar-slider-row input[type="range"] { width: 65%; accent-color: var(--accent); cursor: pointer; }
 
@@ -182,10 +182,15 @@
 
         .voice-radar-float { position: absolute; top: 80px; right: 20px; z-index: 9999; transform: scale(0.65); margin: 0; }
 
-        /* === ZOOM CONTROL === */
+        /* === ZOOM E CONTROLES OCULTÁVEIS === */
         .zoom-container { position: absolute; right: 25px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; z-index: 5; background: var(--bg-card); padding: 15px 8px; border-radius: 30px; backdrop-filter: blur(15px); border: 1px solid var(--border);}
         .zoom-slider { appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 3px; height: 120px; outline: none; background: rgba(0,0,0,0.1); border-radius: 5px; cursor: pointer; accent-color: var(--dark);}
         .zoom-icon { color: var(--text); font-size: 14px; font-weight: 300; margin: 10px 0; }
+
+        .btn-toggle-ui { position: absolute; top: 20px; right: 145px; z-index: 10000; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: 0.3s;}
+        .btn-toggle-ui:hover { background: var(--bg-gradient); }
+
+        #screen-radar.hide-ui .radar-control-btn { display: none !important; }
 
         /* === NOTIFICAÇÕES E LISTA DO PERFIL === */
         .radar-notifications-panel { position: absolute; top: 80px; left: 20px; z-index: 5; display: flex; flex-direction: column; gap: 10px; max-width: 250px; pointer-events: none;}
@@ -203,6 +208,11 @@
     </style>
 </head>
 <body>
+
+    <div id="global-loader">
+        <div class="spinner"></div>
+        <p style="color: var(--text); font-size: 13px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">Conectando à Rede Global...</p>
+    </div>
 
     <div class="top-bar-ui">
         <select class="language-selector" id="lang-select" onchange="changeLanguage()">
@@ -252,9 +262,12 @@
     <div id="ar-modal" class="modal-bg">
         <div class="modal-card">
             <h3 style="margin-top: 0; color: var(--accent);">Criar AR no Ambiente</h3>
-            <p style="font-size: 12px; margin-bottom: 15px; color: var(--text);">A tela ficará fixa nas suas coordenadas GPS atuais.</p>
-            <input type="text" id="ar-title" class="input-modern" style="width:100%;" placeholder="Título da Tela (Ex: Bem-vindos!)">
-            <input type="text" id="ar-content" class="input-modern" style="width:100%;" placeholder="Mensagem, URL de Imagem ou Vídeo">
+            <p style="font-size: 12px; margin-bottom: 15px; color: var(--text);">Fixe uma mensagem, modelo 3D ou vídeo nas suas coordenadas atuais.</p>
+            
+            <input type="text" id="ar-title" class="input-modern" style="width:100%;" placeholder="Título (Ex: Projeto Integrador)">
+            <input type="text" id="ar-text" class="input-modern" style="width:100%;" placeholder="Descrição / Texto explicativo">
+            <input type="text" id="ar-media" class="input-modern" style="width:100%;" placeholder="Opcional: Link YouTube, Imagem ou .glb">
+            
             <button class="btn" style="width: 100%;" onclick="saveARObject()">Deixar AR Aqui</button>
             <button class="btn btn-outline" style="width: 100%; margin-top: 10px;" onclick="document.getElementById('ar-modal').style.display='none'">Cancelar</button>
         </div>
@@ -317,18 +330,20 @@
     </div>
 
     <div id="screen-radar" class="screen">
+        <button class="btn-toggle-ui radar-control-btn" onclick="toggleRadarVisibility()">👁️ Ocultar Controles</button>
+
         <div id="radar-container">
             <video id="video-radar" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
             <canvas id="canvas-ar"></canvas>
             <div id="html-overlay-container"></div>
-            <div class="radar-notifications-panel" id="live-notifications" style="display: none;"></div>
+            <div class="radar-notifications-panel radar-control-btn" id="live-notifications" style="display: none;"></div>
             
-            <div class="voice-orb-container voice-radar-float" id="voice-radar-btn" onclick="toggleVoiceAI()">
+            <div class="voice-orb-container voice-radar-float radar-control-btn" id="voice-radar-btn" onclick="toggleVoiceAI()">
                 <div class="voice-orb"></div>
             </div>
         </div>
         
-        <div class="zoom-container" id="zoom-controls" style="display: none;">
+        <div class="zoom-container radar-control-btn" id="zoom-controls" style="display: none;">
             <div class="zoom-icon">+</div>
             <input type="range" class="zoom-slider" id="camera-zoom" min="1" max="3" step="0.1" value="1">
             <div class="zoom-icon">-</div>
@@ -345,15 +360,15 @@
             <div class="ar-slider-row"><span>Giro Z (Eixo 2D)</span> <input type="range" id="ar-edit-rotZ" min="-180" max="180" value="0"></div>
             
             <div style="display:flex; gap:10px; margin-top:15px;">
-                <button class="btn" style="flex:1; padding:10px; margin:0; font-size:12px;" onclick="saveARTransform()">Salvar Ângulo</button>
-                <button class="btn btn-outline" style="flex:1; padding:10px; margin:0; font-size:12px;" onclick="closeAREditor()">Fechar Edição</button>
+                <button class="btn" style="flex:1; padding:10px; margin:0; font-size:12px;" onclick="saveARTransform()">Salvar Posição</button>
+                <button class="btn btn-outline" style="flex:1; padding:10px; margin:0; font-size:12px;" onclick="closeAREditor()">Fechar</button>
             </div>
         </div>
 
-        <button class="btn-mini" style="position: absolute; bottom: 210px; z-index: 3; padding: 10px 18px; border-color: #10b981; color: #10b981;" onclick="openARModal()">📍 Deixar Info AR Aqui</button>
-        <button class="btn-mini" id="btn-ocultar-avisos" style="position: absolute; bottom: 160px; z-index: 3; padding: 10px 18px;" onclick="toggleRadarNotifications()">🔔 <span data-i18n="btn_toggle_alerts">Ocultar Avisos</span></button>
-        <button class="btn btn-outline" id="btn-trocar-camera" style="position: absolute; bottom: 100px; width: auto; padding: 14px 28px; z-index: 3; background: var(--bg-card); backdrop-filter: blur(10px); border-color: transparent;" onclick="switchRadarCamera()" data-i18n="btn_switch_cam">Trocar Câmera</button>
-        <button class="btn" id="btn-sair-radar" style="position: absolute; bottom: 35px; width: auto; padding: 14px 28px; z-index: 3; background: var(--danger); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);" onclick="location.reload()" data-i18n="btn_exit_radar">Desconectar Radar</button>
+        <button class="btn-mini radar-control-btn" style="position: absolute; bottom: 210px; z-index: 3; padding: 10px 18px; border-color: #10b981; color: #10b981;" onclick="openARModal()">📍 Deixar Info AR Aqui</button>
+        <button class="btn-mini radar-control-btn" id="btn-ocultar-avisos" style="position: absolute; bottom: 160px; z-index: 3; padding: 10px 18px;" onclick="toggleRadarNotifications()">🔔 <span data-i18n="btn_toggle_alerts">Ocultar Avisos</span></button>
+        <button class="btn btn-outline radar-control-btn" id="btn-trocar-camera" style="position: absolute; bottom: 100px; width: auto; padding: 14px 28px; z-index: 3; background: var(--bg-card); backdrop-filter: blur(10px); border-color: transparent;" onclick="switchRadarCamera()" data-i18n="btn_switch_cam">Trocar Câmera</button>
+        <button class="btn radar-control-btn" id="btn-sair-radar" style="position: absolute; bottom: 35px; width: auto; padding: 14px 28px; z-index: 3; background: var(--danger); box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);" onclick="location.reload()" data-i18n="btn_exit_radar">Desconectar Radar</button>
     </div>
 
     <div vw class="enabled"><div vw-access-button class="active"></div><div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div></div>
@@ -362,8 +377,15 @@
 
     <script>
         // =========================================================================
-        // 0. SISTEMA DE IDIOMAS E TEMA
+        // 0. SISTEMA DE IDIOMAS E TEMA E TOGGLE UI
         // =========================================================================
+        function toggleRadarVisibility() {
+            const radarScreen = document.getElementById('screen-radar');
+            radarScreen.classList.toggle('hide-ui');
+            const btn = document.querySelector('.btn-toggle-ui');
+            btn.innerHTML = radarScreen.classList.contains('hide-ui') ? '👁️ Mostrar Controles' : '👁️ Ocultar Controles';
+        }
+
         const translations = {
             pt: {
                 app_title: "Interação Global", btn_colorblind: "Daltônicos", btn_accessibility: "Acessibilidade ▼", orb_label: "Assistente de Voz", btn_register: "Novo Cadastro",
@@ -432,7 +454,16 @@
         let currentDescriptor = null; let usersList = []; let arObjectsList = []; let authAction = ''; let authTargetId = null; let currentRadarCamMode = "environment"; 
         let mySecureId = localStorage.getItem('mySecureId') || null; let myNameLocal = localStorage.getItem('myName') || "Usuário";
         
-        let myGeoPos = null; // Para AR
+        let myGeoPos = null; 
+
+        // RASTREADORES DO GIROSCÓPIO E BÚSSOLA
+        let compassHeading = 0;
+        let devicePitch = 90;
+
+        window.addEventListener('deviceorientation', function(e) {
+            compassHeading = e.webkitCompassHeading || (360 - e.alpha) || 0;
+            devicePitch = e.beta || 90;
+        }, true);
 
         // =========================================================================
         // 2. IA ASSISTENTE DE VOZ NEURAL
@@ -518,7 +549,7 @@
         window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
 
         // =========================================================================
-        // 3. OTIMIZAÇÃO AVANÇADA (ANTI-LAG)
+        // 3. OTIMIZAÇÃO AVANÇADA (TELA DE CARREGAMENTO GLOBAL E ANTI-LAG)
         // =========================================================================
         async function startApp() {
             try {
@@ -540,7 +571,14 @@
                     authTargetId = mySecureId; 
                     listenToRadarNotifications();
                 }
-            } catch (e) { console.error("Erro ao carregar IA:", e); }
+                
+                document.getElementById('global-loader').style.opacity = '0';
+                setTimeout(() => { document.getElementById('global-loader').style.display = 'none'; }, 500);
+
+            } catch (e) { 
+                console.error("Erro ao carregar IA:", e);
+                document.getElementById('global-loader').innerHTML = `<p style="color:var(--danger);">Erro de conexão com servidor. Recarregue a página.</p>`;
+            }
         }
 
         function openLGPD() { document.getElementById('lgpd-modal').style.display = 'flex'; }
@@ -566,7 +604,7 @@
         }
 
         // =========================================================================
-        // 4. CADASTRO, AUTENTICAÇÃO E BANCO
+        // 4. CADASTRO E AUTENTICAÇÃO OTIMIZADA PARA CELULAR
         // =========================================================================
         async function monitorCapture() {
             const video = document.getElementById('video-register'); const status = document.getElementById('ia-status');
@@ -637,7 +675,7 @@
                         const detect = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
                         if (detect) {
                             const match = findBestMatch(detect.descriptor);
-                            if (match.distance < 0.38) { 
+                            if (match.distance < 0.42) { 
                                 clearInterval(interval); status.innerText = `Autenticado: ${match.name}`; status.style.color = "#3b82f6";
                                 authTargetId = match.id; localStorage.setItem('mySecureId', match.id); localStorage.setItem('myName', match.name);
                                 mySecureId = match.id; myNameLocal = match.name;
@@ -657,7 +695,7 @@
                     } catch(e) {}
                     isDetecting = false;
                 }
-            }, 300);
+            }, 150);
         }
 
         // =========================================================================
@@ -712,11 +750,11 @@
         }
 
         // =========================================================================
-        // 6. RADAR AR E MANIPULAÇÃO ESPACIAL 3D (POSIÇÃO, ROTAÇÃO, TAMANHO)
+        // 6. RADAR AR E MOTOR DE ANCORAGEM ESPACIAL (GIROSCÓPIO + GPS)
         // =========================================================================
         let showRadarNotifications = true;
         let radarNotificationListener = null;
-        let currentEditingAR = null; // Armazena qual objeto AR está sendo editado no momento
+        let currentEditingAR = null; 
 
         function toggleRadarNotifications() { showRadarNotifications = !showRadarNotifications; document.getElementById('live-notifications').style.display = showRadarNotifications ? 'flex' : 'none'; }
 
@@ -759,22 +797,24 @@
 
         async function saveARObject() {
             const title = document.getElementById('ar-title').value;
-            const content = document.getElementById('ar-content').value;
+            const text = document.getElementById('ar-text').value;
+            const media = document.getElementById('ar-media').value.trim();
             if(!title) return Swal.fire('Atenção', 'Insira um título.', 'warning');
             
-            // Transformação inicial padrão no centro da tela e plana
             const defaultTransform = { x: 50, y: 50, scale: 1, rotX: 0, rotY: 0, rotZ: 0 };
             
             await db.ref('ar_objects/' + Date.now()).set({
-                lat: myGeoPos.lat, lng: myGeoPos.lng, title: title, content: content, ownerId: mySecureId || 'anon',
+                lat: myGeoPos.lat, lng: myGeoPos.lng, 
+                baseHeading: compassHeading, // Salva o ângulo exato para o qual o celular está apontando
+                basePitch: devicePitch,
+                title: title, text: text, media: media, ownerId: mySecureId || 'anon',
                 transform: defaultTransform
             });
             document.getElementById('ar-modal').style.display = 'none';
-            document.getElementById('ar-title').value = ''; document.getElementById('ar-content').value = '';
-            Swal.fire('AR Fixado!', 'Agora você pode usar "Editar Posição" para posicioná-lo pelo ambiente.', 'success');
+            document.getElementById('ar-title').value = ''; document.getElementById('ar-text').value = ''; document.getElementById('ar-media').value = '';
+            Swal.fire('AR Fixado!', 'Sua criação está ancorada no ar. Você pode usar "Editar Posição" se precisar ajustar.', 'success');
         }
 
-        // --- SISTEMA DE EDIÇÃO LIVE DO AR ---
         function openAREditor(id) {
             currentEditingAR = arObjectsList.find(o => o.id === id);
             if(!currentEditingAR) return;
@@ -790,20 +830,30 @@
             
             document.getElementById('ar-edit-panel').style.display = 'block';
             
-            // Atualiza os estilos CSS em tempo real conforme arrasta o slider
             const updateLiveTransform = () => {
                 let cardId = `ar-${id}`;
                 let card = document.getElementById(cardId);
                 if(card) {
-                    const vx = document.getElementById('ar-edit-x').value;
-                    const vy = document.getElementById('ar-edit-y').value;
-                    const vs = document.getElementById('ar-edit-scale').value;
-                    const rx = document.getElementById('ar-edit-rotX').value;
-                    const ry = document.getElementById('ar-edit-rotY').value;
-                    const rz = document.getElementById('ar-edit-rotZ').value;
+                    const vx = parseFloat(document.getElementById('ar-edit-x').value);
+                    const vy = parseFloat(document.getElementById('ar-edit-y').value);
+                    const vs = parseFloat(document.getElementById('ar-edit-scale').value);
+                    const rx = parseFloat(document.getElementById('ar-edit-rotX').value);
+                    const ry = parseFloat(document.getElementById('ar-edit-rotY').value);
+                    const rz = parseFloat(document.getElementById('ar-edit-rotZ').value);
                     
-                    card.style.left = `${vx}%`;
-                    card.style.top = `${vy}%`;
+                    // Integra o offset do giroscópio ao vivo para que não pule ao editar
+                    let bHead = currentEditingAR.baseHeading || 0;
+                    let bPitch = currentEditingAR.basePitch || 90;
+                    
+                    let dHead = compassHeading - bHead;
+                    if(dHead > 180) dHead -= 360; if(dHead < -180) dHead += 360;
+                    let dPitch = devicePitch - bPitch;
+
+                    let screenX = vx - (dHead * 1.6);
+                    let screenY = vy - (dPitch * 1.6);
+
+                    card.style.left = `${screenX}%`;
+                    card.style.top = `${screenY}%`;
                     card.style.transform = `translate(-50%, -50%) scale(${vs}) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
                 }
             };
@@ -821,45 +871,65 @@
         async function saveARTransform() {
             if(!currentEditingAR) return;
             const newTransform = {
-                x: document.getElementById('ar-edit-x').value,
-                y: document.getElementById('ar-edit-y').value,
-                scale: document.getElementById('ar-edit-scale').value,
-                rotX: document.getElementById('ar-edit-rotX').value,
-                rotY: document.getElementById('ar-edit-rotY').value,
-                rotZ: document.getElementById('ar-edit-rotZ').value
+                x: parseFloat(document.getElementById('ar-edit-x').value),
+                y: parseFloat(document.getElementById('ar-edit-y').value),
+                scale: parseFloat(document.getElementById('ar-edit-scale').value),
+                rotX: parseFloat(document.getElementById('ar-edit-rotX').value),
+                rotY: parseFloat(document.getElementById('ar-edit-rotY').value),
+                rotZ: parseFloat(document.getElementById('ar-edit-rotZ').value)
             };
             
             await db.ref('ar_objects/' + currentEditingAR.id).update({ transform: newTransform });
             closeAREditor();
-            Swal.fire({icon: 'success', title: 'Salvo!', text: 'Sua arte 3D foi fixada nesta posição e ângulo para todos que passarem.', timer: 2000, showConfirmButton: false});
+            Swal.fire({icon: 'success', title: 'Salvo!', text: 'Posição tridimensional ancorada com sucesso.', timer: 2000, showConfirmButton: false});
         }
 
-        // --- RENDERIZADOR AR ---
         function renderARObjects(overlayContainer) {
             if(!myGeoPos) return;
-
             let activeIds = new Set();
 
             arObjectsList.forEach(obj => {
                 const dist = getDistanceFromLatLonInM(myGeoPos.lat, myGeoPos.lng, obj.lat, obj.lng);
-                if(dist < 20) { 
+                
+                if(dist < 50) { // Raio de visão expandido para 50 metros para testar o scale
                     activeIds.add(obj.id);
                     let cardId = `ar-${obj.id}`;
                     let card = document.getElementById(cardId);
                     
-                    // SE O CARTÃO NÃO EXISTE NA TELA, CRIA:
                     if(!card) {
                         card = document.createElement('div'); card.id = cardId; card.className = 'glass-card ar-item-card';
                         
                         let htmlContent = `<h4 style="margin-bottom:8px;">✨ ${obj.title}</h4>`;
-                        if(obj.content.startsWith('http')) {
-                            if(obj.content.match(/\.(jpeg|jpg|gif|png)$/)) htmlContent += `<img src="${obj.content}" style="max-width:100%; max-height:150px; border-radius:8px; margin-top:5px; pointer-events:none;">`;
-                            else htmlContent += `<a href="${obj.content}" target="_blank" style="color:var(--accent); font-size:12px; pointer-events:auto;">🔗 Acessar Mídia</a>`;
-                        } else {
-                            htmlContent += `<p style="font-size:14px;">${obj.content}</p>`;
+                        
+                        if (obj.media) {
+                            let ytMatch = obj.media.match(/(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/))([\w-]{11})/i);
+                            
+                            if(obj.media.match(/\.(glb|gltf)$/i)) {
+                                htmlContent += `<model-viewer src="${obj.media}" auto-rotate camera-controls style="width: 100%; height: 200px; background-color: transparent; border-radius: 8px; margin-top:5px; pointer-events:auto;"></model-viewer>`;
+                            }
+                            else if(ytMatch && ytMatch[1]) {
+                                const videoId = ytMatch[1];
+                                htmlContent += `<iframe width="100%" height="160" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius:8px; margin-top:5px; pointer-events:auto; background:#000;"></iframe>`;
+                                
+                                htmlContent += `
+                                    <div style="text-align:center; margin-top:10px;">
+                                        <a href="https://youtu.be/${videoId}" target="_blank" style="display:inline-block; padding:8px 15px; background:var(--danger); color:#fff; border-radius:20px; text-decoration:none; font-size:12px; pointer-events:auto; font-weight:bold; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);">
+                                            ▶️ Abrir no App do YouTube
+                                        </a>
+                                    </div>`;
+                            }
+                            else if(obj.media.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                                htmlContent += `<img src="${obj.media}" style="max-width:100%; max-height:150px; border-radius:8px; margin-top:5px; pointer-events:none;">`;
+                            }
+                            else if(obj.media.startsWith('http')) {
+                                htmlContent += `<a href="${obj.media}" target="_blank" style="display:inline-block; margin-top:5px; padding:8px 15px; background:var(--accent); color:#fff; border-radius:20px; text-decoration:none; font-size:12px; pointer-events:auto;">🔗 Acessar Link Mídia</a>`;
+                            }
+                        }
+
+                        if (obj.text) {
+                            htmlContent += `<p style="font-size:14px; margin-top:10px;">${obj.text}</p>`;
                         }
                         
-                        // Botões do dono para excluir e posicionar/angulação
                         if(obj.ownerId === mySecureId && mySecureId != null) {
                             htmlContent += `<div style="display:flex; gap:5px; margin-top:15px; pointer-events:auto;">
                                                 <button style="background:var(--accent); border:none; color:#fff; padding:6px; border-radius:5px; font-size:11px; cursor:pointer; flex:1;" onclick="openAREditor('${obj.id}')">📐 Editar Posição</button>
@@ -867,22 +937,40 @@
                                             </div>`;
                         }
                         card.innerHTML = htmlContent;
-                        card.style.transformOrigin = 'center center'; // Para giros corretos
+                        card.style.transformOrigin = 'center center'; 
                         overlayContainer.appendChild(card);
                     }
                     
-                    // ATUALIZA A POSIÇÃO APENAS SE NÃO ESTIVER SENDO EDITADO NESTE MOMENTO
-                    // Isso permite que o usuário veja a mudança fluida sem que o render sobrescreva com os dados antigos do firebase a cada frame
                     if (!currentEditingAR || currentEditingAR.id !== obj.id) {
                         const t = obj.transform || { x: 50, y: 50, scale: 1, rotX: 0, rotY: 0, rotZ: 0 };
-                        card.style.left = `${t.x}%`; 
-                        card.style.top = `${t.y}%`;
-                        card.style.transform = `translate(-50%, -50%) scale(${t.scale}) rotateX(${t.rotX}deg) rotateY(${t.rotY}deg) rotateZ(${t.rotZ}deg)`;
+                        
+                        // FÍSICA AR: CÁLCULO DE ANCORAGEM GIROSCÓPICA
+                        let bHead = obj.baseHeading || 0;
+                        let bPitch = obj.basePitch || 90;
+
+                        let deltaHeading = compassHeading - bHead;
+                        if (deltaHeading > 180) deltaHeading -= 360;
+                        if (deltaHeading < -180) deltaHeading += 360;
+
+                        let deltaPitch = devicePitch - bPitch;
+
+                        let screenX = t.x - (deltaHeading * 1.6);
+                        let screenY = t.y - (deltaPitch * 1.6);
+
+                        // FÍSICA AR: CÁLCULO DE ESCALA POR DISTÂNCIA GPS
+                        let distScale = 1;
+                        if(dist > 2) { distScale = 2 / dist; }
+                        if(distScale < 0.2) distScale = 0.2; // Limite mínimo de tamanho para não desaparecer
+                        
+                        let finalScale = t.scale * distScale;
+
+                        card.style.left = `${screenX}%`; 
+                        card.style.top = `${screenY}%`;
+                        card.style.transform = `translate(-50%, -50%) scale(${finalScale}) rotateX(${t.rotX}deg) rotateY(${t.rotY}deg) rotateZ(${t.rotZ}deg)`;
                     }
                 }
             });
             
-            // Remove da tela os AR cards antigos que ficaram fora de alcance ou foram excluídos
             Array.from(overlayContainer.children).forEach(child => { 
                 if(child.classList.contains('ar-item-card')) {
                     const rawId = child.id.replace('ar-', '');
@@ -892,6 +980,13 @@
         }
 
         async function startRadarView() {
+            // Solicita permissão no iOS 13+ para usar o Giroscópio
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                try {
+                    await DeviceOrientationEvent.requestPermission();
+                } catch (e) { console.warn("Permissão de giroscópio ignorada ou não suportada", e); }
+            }
+
             if(isVoiceActive) speakNeural("Você agora está online e com mapeamento ativo.");
             changeScreen('screen-radar'); await startCamera('video-radar', currentRadarCamMode);
             
@@ -914,6 +1009,9 @@
                     
                     const now = Date.now();
                     
+                    // Renderiza os objetos AR fixos a todo momento (para o giroscópio ser suave)
+                    renderARObjects(overlayContainer);
+
                     if (now - lastProcessingTime > processingDelay && !isRadarDetecting) { 
                         isRadarDetecting = true;
                         lastProcessingTime = now;
@@ -981,12 +1079,9 @@
                                     const padding = 20; ctx.fillRect(x - padding, y - padding, width + (padding*2), height + (padding*2)); ctx.restore(); 
                                 }
                             });
-                            
-                            // Renderiza itens Fixos AR na tela (Não afeta IDs do face api)
-                            renderARObjects(overlayContainer);
 
                             Array.from(overlayContainer.children).forEach(child => { 
-                                if(child.classList.contains('ar-item-card')) return; // ignora as artes 3D manuais
+                                if(child.classList.contains('ar-item-card')) return; 
                                 const rawId = child.id.replace('card-', ''); 
                                 if (!currentFrameIds.has(rawId)) overlayContainer.removeChild(child); 
                             });
@@ -998,7 +1093,8 @@
                 processFrame();
             });
         }
-        startApp();
+        
+        window.onload = startApp;
     </script>
 </body>
 </html>
