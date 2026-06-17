@@ -69,19 +69,13 @@
         }
         .active { display: flex; }
 
-        /* TELA DE CARREGAMENTO GLOBAL */
+        /* TELA DE CARREGAMENTO GLOBAL COM ORBE NEURAL */
         #global-loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-gradient); z-index: 100000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.5s ease;
         }
-        .spinner {
-            width: 40px; height: 40px; border: 3px solid var(--border);
-            border-top: 3px solid var(--accent); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 15px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .btn {
             background: var(--dark); color: #fff; border: none; padding: 14px 28px;
@@ -137,11 +131,12 @@
         .glass-card p { margin: 3px 0; font-size: 13px; color: var(--text); display: flex; align-items: center; opacity: 0.8;}
         .glass-card p.tap-hint { font-size: 10px; color: var(--accent); margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
 
+        /* TRANSIÇÕES OTIMIZADAS PARA O EFEITO ESTÁTUA (LERP Sincronizado) */
         .ar-item-card { 
             border-color: #10b981; 
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, left 0.1s linear, top 0.1s linear, transform 0.1s linear;
             transform-style: preserve-3d;
-            backface-visibility: visible;
+            backface-visibility: hidden;
         }
 
         .ar-slider-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text); margin-bottom: 8px;}
@@ -163,7 +158,7 @@
         [vw-access-button] { display: none !important; }
 
         /* === ORBE ASSISTENTE DE VOZ NEURAL === */
-        .voice-orb-container { margin: 30px 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto; }
+        .voice-orb-container { display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto; }
         .voice-orb {
             width: 80px; height: 80px; border-radius: 50%; cursor: pointer; position: relative;
             background: radial-gradient(circle at 30% 30%, #ffffff, var(--accent) 60%, var(--dark) 100%);
@@ -187,6 +182,7 @@
         .zoom-slider { appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 3px; height: 120px; outline: none; background: rgba(0,0,0,0.1); border-radius: 5px; cursor: pointer; accent-color: var(--dark);}
         .zoom-icon { color: var(--text); font-size: 14px; font-weight: 300; margin: 10px 0; }
 
+        /* NOTA: Classe 'radar-control-btn' REMOVIDA daqui para ele nunca sumir */
         .btn-toggle-ui { position: absolute; top: 20px; right: 145px; z-index: 10000; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: 0.3s;}
         .btn-toggle-ui:hover { background: var(--bg-gradient); }
 
@@ -210,8 +206,10 @@
 <body>
 
     <div id="global-loader">
-        <div class="spinner"></div>
-        <p style="color: var(--text); font-size: 13px; font-weight: 400; text-transform: uppercase; letter-spacing: 1px;">Conectando à Rede Global...</p>
+        <div class="voice-orb-container voice-active" style="pointer-events:none; transform: scale(1.2);">
+            <div class="voice-orb"></div>
+        </div>
+        <p style="color: var(--text); font-size: 13px; font-weight: 400; text-transform: uppercase; letter-spacing: 2px; margin-top: 40px;">Conectando .</p>
     </div>
 
     <div class="top-bar-ui">
@@ -330,7 +328,7 @@
     </div>
 
     <div id="screen-radar" class="screen">
-        <button class="btn-toggle-ui radar-control-btn" onclick="toggleRadarVisibility()">👁️ Ocultar Controles</button>
+        <button class="btn-toggle-ui" onclick="toggleRadarVisibility()">👁️ Ocultar Controles</button>
 
         <div id="radar-container">
             <video id="video-radar" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
@@ -349,7 +347,7 @@
             <div class="zoom-icon">-</div>
         </div>
         
-        <div id="ar-edit-panel" class="glass-card" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); z-index:100; width:90%; max-width:350px;">
+        <div id="ar-edit-panel" class="glass-card radar-control-btn" style="display:none; position:absolute; bottom:20px; left:50%; transform:translateX(-50%); z-index:100; width:90%; max-width:350px;">
             <h4 style="margin-bottom:15px; color:var(--accent); text-align:center;">Manipulação 3D (AR)</h4>
             
             <div class="ar-slider-row"><span>Eixo X (Esquerda/Direita)</span> <input type="range" id="ar-edit-x" min="0" max="100" value="50"></div>
@@ -456,13 +454,29 @@
         
         let myGeoPos = null; 
 
-        // RASTREADORES DO GIROSCÓPIO E BÚSSOLA
+        // RASTREADORES DO GIROSCÓPIO E BÚSSOLA OTIMIZADOS (FILTRO LERP PARA EFEITO "ESTÁTUA")
         let compassHeading = 0;
         let devicePitch = 90;
+        let smoothHeading = null;
+        let smoothPitch = null;
 
         window.addEventListener('deviceorientation', function(e) {
-            compassHeading = e.webkitCompassHeading || (360 - e.alpha) || 0;
-            devicePitch = e.beta || 90;
+            let rawHeading = e.webkitCompassHeading || (360 - e.alpha) || 0;
+            let rawPitch = e.beta || 90;
+
+            if (smoothHeading === null) smoothHeading = rawHeading;
+            if (smoothPitch === null) smoothPitch = rawPitch;
+
+            // Filtro Passa-Baixa para evitar tremedeira da tela
+            let diff = rawHeading - smoothHeading;
+            if (diff > 180) diff -= 360;
+            if (diff < -180) diff += 360;
+
+            smoothHeading += diff * 0.5;
+            smoothPitch += (rawPitch - smoothPitch) * 0.5;
+
+            compassHeading = smoothHeading;
+            devicePitch = smoothPitch;
         }, true);
 
         // =========================================================================
@@ -549,7 +563,7 @@
         window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
 
         // =========================================================================
-        // 3. OTIMIZAÇÃO AVANÇADA (TELA DE CARREGAMENTO GLOBAL E ANTI-LAG)
+        // 3. OTIMIZAÇÃO AVANÇADA E TELA DE CARREGAMENTO GLOBAL
         // =========================================================================
         async function startApp() {
             try {
@@ -750,7 +764,7 @@
         }
 
         // =========================================================================
-        // 6. RADAR AR E MOTOR DE ANCORAGEM ESPACIAL (GIROSCÓPIO + GPS)
+        // 6. RADAR AR E MOTOR DE ANCORAGEM ESPACIAL
         // =========================================================================
         let showRadarNotifications = true;
         let radarNotificationListener = null;
@@ -805,7 +819,7 @@
             
             await db.ref('ar_objects/' + Date.now()).set({
                 lat: myGeoPos.lat, lng: myGeoPos.lng, 
-                baseHeading: compassHeading, // Salva o ângulo exato para o qual o celular está apontando
+                baseHeading: compassHeading,
                 basePitch: devicePitch,
                 title: title, text: text, media: media, ownerId: mySecureId || 'anon',
                 transform: defaultTransform
@@ -841,7 +855,6 @@
                     const ry = parseFloat(document.getElementById('ar-edit-rotY').value);
                     const rz = parseFloat(document.getElementById('ar-edit-rotZ').value);
                     
-                    // Integra o offset do giroscópio ao vivo para que não pule ao editar
                     let bHead = currentEditingAR.baseHeading || 0;
                     let bPitch = currentEditingAR.basePitch || 90;
                     
@@ -849,8 +862,9 @@
                     if(dHead > 180) dHead -= 360; if(dHead < -180) dHead += 360;
                     let dPitch = devicePitch - bPitch;
 
-                    let screenX = vx - (dHead * 1.6);
-                    let screenY = vy - (dPitch * 1.6);
+                    // O 1.666 é o cálculo derivado do FOV de uma lente Mobile padrão
+                    let screenX = vx - (dHead * 1.666);
+                    let screenY = vy - (dPitch * 2.222);
 
                     card.style.left = `${screenX}%`;
                     card.style.top = `${screenY}%`;
@@ -891,7 +905,7 @@
             arObjectsList.forEach(obj => {
                 const dist = getDistanceFromLatLonInM(myGeoPos.lat, myGeoPos.lng, obj.lat, obj.lng);
                 
-                if(dist < 50) { // Raio de visão expandido para 50 metros para testar o scale
+                if(dist < 50) { 
                     activeIds.add(obj.id);
                     let cardId = `ar-${obj.id}`;
                     let card = document.getElementById(cardId);
@@ -944,7 +958,6 @@
                     if (!currentEditingAR || currentEditingAR.id !== obj.id) {
                         const t = obj.transform || { x: 50, y: 50, scale: 1, rotX: 0, rotY: 0, rotZ: 0 };
                         
-                        // FÍSICA AR: CÁLCULO DE ANCORAGEM GIROSCÓPICA
                         let bHead = obj.baseHeading || 0;
                         let bPitch = obj.basePitch || 90;
 
@@ -954,13 +967,12 @@
 
                         let deltaPitch = devicePitch - bPitch;
 
-                        let screenX = t.x - (deltaHeading * 1.6);
-                        let screenY = t.y - (deltaPitch * 1.6);
+                        let screenX = t.x - (deltaHeading * 1.666);
+                        let screenY = t.y - (deltaPitch * 2.222);
 
-                        // FÍSICA AR: CÁLCULO DE ESCALA POR DISTÂNCIA GPS
                         let distScale = 1;
                         if(dist > 2) { distScale = 2 / dist; }
-                        if(distScale < 0.2) distScale = 0.2; // Limite mínimo de tamanho para não desaparecer
+                        if(distScale < 0.2) distScale = 0.2; 
                         
                         let finalScale = t.scale * distScale;
 
@@ -980,7 +992,6 @@
         }
 
         async function startRadarView() {
-            // Solicita permissão no iOS 13+ para usar o Giroscópio
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 try {
                     await DeviceOrientationEvent.requestPermission();
@@ -1009,7 +1020,7 @@
                     
                     const now = Date.now();
                     
-                    // Renderiza os objetos AR fixos a todo momento (para o giroscópio ser suave)
+                    // Renderiza os objetos AR fixos a todo momento
                     renderARObjects(overlayContainer);
 
                     if (now - lastProcessingTime > processingDelay && !isRadarDetecting) { 
