@@ -116,28 +116,30 @@
         video { width: 100%; height: 100%; object-fit: cover; }
 
         #radar-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; background: #000; overflow: hidden; }
-        #canvas-ar { position: absolute; top: 0; left: 0; pointer-events: none; }
+        #canvas-ar { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 2; }
         
-        #html-overlay-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: hidden; perspective: 1200px; transform-style: preserve-3d; }
+        #html-overlay-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; pointer-events: none; overflow: hidden; perspective: 1000px; transform-style: preserve-3d; }
 
+        /* MODO VISÃO ESPACIAL - ESTÁTUA. Removido transition de left e top para ser instantâneo a 60fps */
         .glass-card {
             position: absolute; background: var(--bg-card); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border); border-radius: 16px; padding: 15px 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            min-width: 180px; pointer-events: auto; cursor: pointer; transition: background 0.3s ease; color: var(--text);
+            min-width: 180px; pointer-events: auto; cursor: pointer; color: var(--text);
             will-change: transform, left, top;
         }
+        
+        /* Apenas opacidade recebe transição no AR para não atrapalhar o LERP a 60fps */
+        .ar-item-card { 
+            border-color: #10b981; 
+            transition: opacity 0.3s ease;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+
         .glass-card:hover { border-color: var(--accent); }
         .glass-card h4 { margin: 0 0 6px 0; font-size: 16px; color: var(--dark); font-weight: 400; }
         .glass-card p { margin: 3px 0; font-size: 13px; color: var(--text); display: flex; align-items: center; opacity: 0.8;}
         .glass-card p.tap-hint { font-size: 10px; color: var(--accent); margin-top: 10px; text-transform: uppercase; letter-spacing: 0.5px;}
-
-        /* TRANSIÇÕES OTIMIZADAS PARA O EFEITO ESTÁTUA (LERP Sincronizado) */
-        .ar-item-card { 
-            border-color: #10b981; 
-            transition: opacity 0.3s, left 0.1s linear, top 0.1s linear, transform 0.1s linear;
-            transform-style: preserve-3d;
-            backface-visibility: hidden;
-        }
 
         .ar-slider-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text); margin-bottom: 8px;}
         .ar-slider-row input[type="range"] { width: 65%; accent-color: var(--accent); cursor: pointer; }
@@ -182,7 +184,6 @@
         .zoom-slider { appearance: slider-vertical; -webkit-appearance: slider-vertical; width: 3px; height: 120px; outline: none; background: rgba(0,0,0,0.1); border-radius: 5px; cursor: pointer; accent-color: var(--dark);}
         .zoom-icon { color: var(--text); font-size: 14px; font-weight: 300; margin: 10px 0; }
 
-        /* NOTA: Classe 'radar-control-btn' REMOVIDA daqui para ele nunca sumir */
         .btn-toggle-ui { position: absolute; top: 20px; right: 145px; z-index: 10000; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: 0.3s;}
         .btn-toggle-ui:hover { background: var(--bg-gradient); }
 
@@ -209,7 +210,7 @@
         <div class="voice-orb-container voice-active" style="pointer-events:none; transform: scale(1.2);">
             <div class="voice-orb"></div>
         </div>
-        <p style="color: var(--text); font-size: 13px; font-weight: 400; text-transform: uppercase; letter-spacing: 2px; margin-top: 40px;">Conectando .</p>
+        <p style="color: var(--text); font-size: 13px; font-weight: 400; text-transform: uppercase; letter-spacing: 3px; margin-top: 50px;">Conectando .</p>
     </div>
 
     <div class="top-bar-ui">
@@ -406,17 +407,6 @@
                 chk_name: "Show Name", chk_bio: "Show Bio", chk_link: "Show Link", chk_contact: "Show Contact",
                 btn_see_viewers: "View view history", btn_save_changes: "Save Changes", btn_exit_profile: "Exit Profile",
                 btn_toggle_alerts: "Toggle Alerts", btn_switch_cam: "Switch Camera", btn_exit_radar: "Disconnect Radar"
-            },
-            es: {
-                app_title: "Interacción Global", btn_colorblind: "Daltónicos", btn_accessibility: "Accesibilidad ▼", orb_label: "Asistente de Voz", btn_register: "Nuevo Registro",
-                btn_radar: "Entrar al Radar", lbl_manage: "Gestionar Cuenta", btn_profile: "Mi Perfil",
-                btn_delete: "Eliminar Cuenta", title_privacy: "Privacidad de Datos", btn_accept: "Aceptar y Continuar",
-                btn_cancel: "Cancelar", title_viewers: "Historial del Radar", text_no_viewers: "No se encontraron registros.",
-                btn_close: "Cerrar", status_waiting: "Esperando alineación facial...", btn_finish_reg: "Finalizar Registro",
-                btn_back: "Volver", status_scanning: "Analizando biometría...", lbl_show_radar: "¿Qué mostrar en Radar?",
-                chk_name: "Mostrar Nombre", chk_bio: "Mostrar Bio", chk_link: "Mostrar Enlace", chk_contact: "Mostrar Contacto",
-                btn_see_viewers: "Ver historial de vistas", btn_save_changes: "Guardar Cambios", btn_exit_profile: "Salir del Perfil",
-                btn_toggle_alerts: "Ocultar Avisos", btn_switch_cam: "Cambiar Cámara", btn_exit_radar: "Desconectar Radar"
             }
         };
 
@@ -424,7 +414,7 @@
             const lang = document.getElementById('lang-select').value;
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if(translations[lang][key]) {
+                if(translations[lang] && translations[lang][key]) {
                     if (el.tagName === 'INPUT') el.placeholder = translations[lang][key];
                     else el.innerText = translations[lang][key];
                 }
@@ -454,26 +444,34 @@
         
         let myGeoPos = null; 
 
-        // RASTREADORES DO GIROSCÓPIO E BÚSSOLA OTIMIZADOS (FILTRO LERP PARA EFEITO "ESTÁTUA")
+        // RASTREADORES DO GIROSCÓPIO COM FILTRO PASSA-BAIXA (LERP) PARA EFEITO "ESTÁTUA"
         let compassHeading = 0;
         let devicePitch = 90;
         let smoothHeading = null;
         let smoothPitch = null;
 
+        function lerpAngle(a, b, t) {
+            let d = b - a;
+            if (d > 180) d -= 360;
+            if (d < -180) d += 360;
+            return a + d * t;
+        }
+
         window.addEventListener('deviceorientation', function(e) {
-            let rawHeading = e.webkitCompassHeading || (360 - e.alpha) || 0;
+            // Suporte cruzado iOS / Android
+            let rawHeading = e.webkitCompassHeading;
+            if (rawHeading === undefined) rawHeading = 360 - e.alpha; 
             let rawPitch = e.beta || 90;
 
-            if (smoothHeading === null) smoothHeading = rawHeading;
-            if (smoothPitch === null) smoothPitch = rawPitch;
+            if (smoothHeading === null) smoothHeading = rawHeading || 0;
+            if (smoothPitch === null) smoothPitch = rawPitch || 90;
 
-            // Filtro Passa-Baixa para evitar tremedeira da tela
-            let diff = rawHeading - smoothHeading;
-            if (diff > 180) diff -= 360;
-            if (diff < -180) diff += 360;
+            // Fator de suavização (0.3). Quanto menor, mais estável e pesada fica a estátua AR
+            smoothHeading = lerpAngle(smoothHeading, rawHeading, 0.3);
+            smoothPitch = smoothPitch + (rawPitch - smoothPitch) * 0.3;
 
-            smoothHeading += diff * 0.5;
-            smoothPitch += (rawPitch - smoothPitch) * 0.5;
+            // Mantém no padrão 0-360
+            smoothHeading = (smoothHeading + 360) % 360;
 
             compassHeading = smoothHeading;
             devicePitch = smoothPitch;
@@ -526,51 +524,24 @@
         }
 
         async function processVoiceCommand(command) {
-            if (command.includes('preencher nome') || command.includes('digitar nome')) {
-                const text = command.split(/nome/)[1].trim(); document.getElementById('user-name').value = text; document.getElementById('edit-name').value = text; speakNeural("Campo nome preenchido com " + text); return;
-            }
-            if (command.includes('preencher cargo') || command.includes('digitar cargo') || command.includes('preencher bio')) {
-                const text = command.split(/cargo|bio/)[1].trim(); document.getElementById('user-bio').value = text; document.getElementById('edit-bio').value = text; speakNeural("Descrição profissional preenchida."); return;
-            }
-            if (command.includes('preencher link')) {
-                const text = command.split(/link/)[1].trim(); document.getElementById('user-link').value = text; document.getElementById('edit-link').value = text; speakNeural("Link atualizado."); return;
-            }
             if (command.includes('cadastro') || command.includes('novo usuário')) { document.getElementById('btn-novo-cadastro').click(); speakNeural("Iniciando credenciamento."); return; } 
             if (command.includes('entrar no radar') || command.includes('ligar radar')) { document.getElementById('btn-entrar-radar').click(); return; } 
             if (command.includes('voltar') || command.includes('sair do radar') || command.includes('início')) { location.reload(); speakNeural("Retornando ao centro de controle."); return; } 
             if (command.includes('meu perfil') || command.includes('abrir perfil')) { document.getElementById('btn-meu-perfil').click(); speakNeural("Acessando área segura do perfil."); return; } 
-            if (command.includes('libras')) { speakNeural("Carregando módulo de acessibilidade em Libras."); document.querySelector('[vw-access-button]').click(); return; } 
-            if (command.includes('daltônico') || command.includes('visão')) { toggleColorblindMode(); return; } 
-            if (command.includes('câmera') || command.includes('inverter câmera')) { document.getElementById('btn-trocar-camera').click(); speakNeural("Lente invertida."); return; }
-            if (command.includes('aceitar') || command.includes('concordo')) { document.getElementById('btn-aceitar-termos').click(); speakNeural("Termos validados."); return; }
-            if (command.includes('finalizar registro') || command.includes('salvar alteração') || command.includes('salvar cadastro')) { 
-                if(document.getElementById('screen-register').classList.contains('active')) document.getElementById('save-btn').click();
-                if(document.getElementById('screen-profile').classList.contains('active')) document.getElementById('btn-salvar-perfil').click();
-                speakNeural("Processando requisição de salvamento."); return; 
-            }
-            if (command.includes('quem me visualizou') || command.includes('histórico')) { document.getElementById('btn-ver-visualizacoes').click(); speakNeural("Abrindo registros de varredura."); return; }
-            if (command.includes('fechar lista') || command.includes('fechar histórico')) { document.getElementById('btn-fechar-lista').click(); speakNeural("Registro recolhido."); return; }
-            if (command.includes('tudo bem') || command.includes('como você está')) { speakNeural("Sistemas operando com máxima eficiência. Pronta para integrar dados."); return; }
-            if (command.includes('quem é você') || command.includes('o que você é')) { speakNeural("Sou a inteligência neural da Interação Global. Fui projetada com arquitetura minimalista para facilitar o acesso à biometria facial, dados seguros e radar em tempo real."); return; }
             
             const questionTrigger = command.match(/(o que é|quem é|quem foi|me explique sobre|fale sobre) (.*)/i);
             if (questionTrigger && questionTrigger[2]) {
                 const query = questionTrigger[2].trim(); speakNeural("Analisando a rede global para " + query + ".");
                 const resposta = await conectarNaRedeNeural(query); speakNeural(resposta); return;
             }
-            speakNeural("Entrada de voz não processada pelos módulos locais. Diga 'Entrar no radar' ou 'Novo cadastro' para navegar.");
         }
-        window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
 
         // =========================================================================
-        // 3. OTIMIZAÇÃO AVANÇADA E TELA DE CARREGAMENTO GLOBAL
+        // 3. OTIMIZAÇÃO AVANÇADA (TELA DE CARREGAMENTO GLOBAL E CÂMERA ALTA DEFINIÇÃO)
         // =========================================================================
         async function startApp() {
             try {
-                try {
-                    await faceapi.tf.setBackend('webgl');
-                    console.log("Otimização de Hardware (WebGL) ativada com sucesso.");
-                } catch(e) { console.warn("WebGL indisponível. Usando processamento padrão da CPU."); }
+                try { await faceapi.tf.setBackend('webgl'); } catch(e) {}
 
                 await auth.signInAnonymously();
                 const MODELS = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js/weights';
@@ -581,18 +552,11 @@
                 loadDatabase();
                 loadARObjects();
                 
-                if(mySecureId) {
-                    authTargetId = mySecureId; 
-                    listenToRadarNotifications();
-                }
+                if(mySecureId) { authTargetId = mySecureId; listenToRadarNotifications(); }
                 
                 document.getElementById('global-loader').style.opacity = '0';
                 setTimeout(() => { document.getElementById('global-loader').style.display = 'none'; }, 500);
-
-            } catch (e) { 
-                console.error("Erro ao carregar IA:", e);
-                document.getElementById('global-loader').innerHTML = `<p style="color:var(--danger);">Erro de conexão com servidor. Recarregue a página.</p>`;
-            }
+            } catch (e) { document.getElementById('global-loader').innerHTML = `<p style="color:var(--danger);">Erro de conexão com servidor.</p>`; }
         }
 
         function openLGPD() { document.getElementById('lgpd-modal').style.display = 'flex'; }
@@ -602,7 +566,11 @@
         let currentStream = null;
         async function startCamera(id, mode) {
             if(currentStream) currentStream.getTracks().forEach(t => t.stop());
-            const constraints = { video: { facingMode: mode, width: { ideal: 320 }, height: { ideal: 240 } } }; 
+            
+            // OTIMIZAÇÃO CÂMERA: Qualidade Alta HD 1080p para o Radar ficar limpo, 
+            // a FaceAPI fará o downscale invisível lá embaixo.
+            const constraints = { video: { facingMode: mode, width: { ideal: 1920 }, height: { ideal: 1080 } } }; 
+            
             currentStream = await navigator.mediaDevices.getUserMedia(constraints);
             document.getElementById(id).srcObject = currentStream;
 
@@ -613,12 +581,12 @@
                     const slider = document.getElementById('camera-zoom'); document.getElementById('zoom-controls').style.display = 'flex';
                     slider.min = capabilities.zoom.min; slider.max = capabilities.zoom.max; slider.step = capabilities.zoom.step; slider.value = track.getSettings().zoom || 1;
                     slider.oninput = (e) => { track.applyConstraints({advanced: [ {zoom: e.target.value} ]}); };
-                } else { document.getElementById('zoom-controls').style.display = 'none'; }
+                }
             }
         }
 
         // =========================================================================
-        // 4. CADASTRO E AUTENTICAÇÃO OTIMIZADA PARA CELULAR
+        // 4. CADASTRO E AUTENTICAÇÃO
         // =========================================================================
         async function monitorCapture() {
             const video = document.getElementById('video-register'); const status = document.getElementById('ia-status');
@@ -713,7 +681,7 @@
         }
 
         // =========================================================================
-        // 5. PERFIL E VISUALIZAÇÕES E BLOQUEIOS
+        // 5. PERFIL E VISUALIZAÇÕES
         // =========================================================================
         function openProfileScreen(match) {
             changeScreen('screen-profile');
@@ -754,17 +722,12 @@
         async function blockUser(viewerIdToBlock) {
             Swal.fire({ title: 'Bloquear usuário?', text: 'Ele não te verá mais no Radar.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Sim, bloquear'
             }).then(async (result) => {
-                if(result.isConfirmed) { 
-                    await db.ref('identities/' + authTargetId + '/blocked/' + viewerIdToBlock).set(true); 
-                    Swal.fire('Bloqueado!', '', 'success'); 
-                    loadDatabase(); 
-                    loadViewersLog(authTargetId); 
-                }
+                if(result.isConfirmed) { await db.ref('identities/' + authTargetId + '/blocked/' + viewerIdToBlock).set(true); Swal.fire('Bloqueado!', '', 'success'); loadDatabase(); loadViewersLog(authTargetId); }
             });
         }
 
         // =========================================================================
-        // 6. RADAR AR E MOTOR DE ANCORAGEM ESPACIAL
+        // 6. RADAR AR 60FPS E ANCORAGEM ESPACIAL SEPARADA DA IA
         // =========================================================================
         let showRadarNotifications = true;
         let radarNotificationListener = null;
@@ -815,7 +778,10 @@
             const media = document.getElementById('ar-media').value.trim();
             if(!title) return Swal.fire('Atenção', 'Insira um título.', 'warning');
             
-            const defaultTransform = { x: 50, y: 50, scale: 1, rotX: 0, rotY: 0, rotZ: 0 };
+            // Lógica Anti-Colisão para objetos criados na mesma coordenada
+            const hash = Date.now().toString().slice(-2);
+            const offsetRandomX = (parseInt(hash) % 20) - 10;
+            const defaultTransform = { x: 50 + offsetRandomX, y: 50, scale: 1, rotX: 0, rotY: 0, rotZ: 0 };
             
             await db.ref('ar_objects/' + Date.now()).set({
                 lat: myGeoPos.lat, lng: myGeoPos.lng, 
@@ -826,176 +792,108 @@
             });
             document.getElementById('ar-modal').style.display = 'none';
             document.getElementById('ar-title').value = ''; document.getElementById('ar-text').value = ''; document.getElementById('ar-media').value = '';
-            Swal.fire('AR Fixado!', 'Sua criação está ancorada no ar. Você pode usar "Editar Posição" se precisar ajustar.', 'success');
+            Swal.fire('AR Fixado!', 'Sua criação está ancorada no ar.', 'success');
         }
 
         function openAREditor(id) {
             currentEditingAR = arObjectsList.find(o => o.id === id);
             if(!currentEditingAR) return;
-            
             const t = currentEditingAR.transform || { x: 50, y: 50, scale: 1, rotX: 0, rotY: 0, rotZ: 0 };
-            
-            document.getElementById('ar-edit-x').value = t.x;
-            document.getElementById('ar-edit-y').value = t.y;
-            document.getElementById('ar-edit-scale').value = t.scale;
-            document.getElementById('ar-edit-rotX').value = t.rotX;
-            document.getElementById('ar-edit-rotY').value = t.rotY;
-            document.getElementById('ar-edit-rotZ').value = t.rotZ;
-            
+            document.getElementById('ar-edit-x').value = t.x; document.getElementById('ar-edit-y').value = t.y; document.getElementById('ar-edit-scale').value = t.scale;
+            document.getElementById('ar-edit-rotX').value = t.rotX; document.getElementById('ar-edit-rotY').value = t.rotY; document.getElementById('ar-edit-rotZ').value = t.rotZ;
             document.getElementById('ar-edit-panel').style.display = 'block';
-            
-            const updateLiveTransform = () => {
-                let cardId = `ar-${id}`;
-                let card = document.getElementById(cardId);
-                if(card) {
-                    const vx = parseFloat(document.getElementById('ar-edit-x').value);
-                    const vy = parseFloat(document.getElementById('ar-edit-y').value);
-                    const vs = parseFloat(document.getElementById('ar-edit-scale').value);
-                    const rx = parseFloat(document.getElementById('ar-edit-rotX').value);
-                    const ry = parseFloat(document.getElementById('ar-edit-rotY').value);
-                    const rz = parseFloat(document.getElementById('ar-edit-rotZ').value);
-                    
-                    let bHead = currentEditingAR.baseHeading || 0;
-                    let bPitch = currentEditingAR.basePitch || 90;
-                    
-                    let dHead = compassHeading - bHead;
-                    if(dHead > 180) dHead -= 360; if(dHead < -180) dHead += 360;
-                    let dPitch = devicePitch - bPitch;
-
-                    // O 1.666 é o cálculo derivado do FOV de uma lente Mobile padrão
-                    let screenX = vx - (dHead * 1.666);
-                    let screenY = vy - (dPitch * 2.222);
-
-                    card.style.left = `${screenX}%`;
-                    card.style.top = `${screenY}%`;
-                    card.style.transform = `translate(-50%, -50%) scale(${vs}) rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
-                }
-            };
-            
-            ['x', 'y', 'scale', 'rotX', 'rotY', 'rotZ'].forEach(axis => {
-                document.getElementById(`ar-edit-${axis}`).oninput = updateLiveTransform;
-            });
         }
 
-        function closeAREditor() {
-            currentEditingAR = null;
-            document.getElementById('ar-edit-panel').style.display = 'none';
-        }
+        function closeAREditor() { currentEditingAR = null; document.getElementById('ar-edit-panel').style.display = 'none'; }
 
         async function saveARTransform() {
             if(!currentEditingAR) return;
-            const newTransform = {
-                x: parseFloat(document.getElementById('ar-edit-x').value),
-                y: parseFloat(document.getElementById('ar-edit-y').value),
-                scale: parseFloat(document.getElementById('ar-edit-scale').value),
-                rotX: parseFloat(document.getElementById('ar-edit-rotX').value),
-                rotY: parseFloat(document.getElementById('ar-edit-rotY').value),
-                rotZ: parseFloat(document.getElementById('ar-edit-rotZ').value)
-            };
-            
+            const newTransform = { x: parseFloat(document.getElementById('ar-edit-x').value), y: parseFloat(document.getElementById('ar-edit-y').value), scale: parseFloat(document.getElementById('ar-edit-scale').value), rotX: parseFloat(document.getElementById('ar-edit-rotX').value), rotY: parseFloat(document.getElementById('ar-edit-rotY').value), rotZ: parseFloat(document.getElementById('ar-edit-rotZ').value) };
             await db.ref('ar_objects/' + currentEditingAR.id).update({ transform: newTransform });
-            closeAREditor();
-            Swal.fire({icon: 'success', title: 'Salvo!', text: 'Posição tridimensional ancorada com sucesso.', timer: 2000, showConfirmButton: false});
+            closeAREditor(); Swal.fire({icon: 'success', title: 'Salvo!', text: 'Posição tridimensional ancorada com sucesso.', timer: 2000, showConfirmButton: false});
         }
 
-        function renderARObjects(overlayContainer) {
+        // --- SISTEMA DE DOM SYNC (Roda devagar, apenas para criar/destruir as caixas de vidro) ---
+        function syncARDOM(overlayContainer) {
             if(!myGeoPos) return;
             let activeIds = new Set();
-
             arObjectsList.forEach(obj => {
                 const dist = getDistanceFromLatLonInM(myGeoPos.lat, myGeoPos.lng, obj.lat, obj.lng);
-                
                 if(dist < 50) { 
                     activeIds.add(obj.id);
                     let cardId = `ar-${obj.id}`;
                     let card = document.getElementById(cardId);
-                    
                     if(!card) {
                         card = document.createElement('div'); card.id = cardId; card.className = 'glass-card ar-item-card';
-                        
                         let htmlContent = `<h4 style="margin-bottom:8px;">✨ ${obj.title}</h4>`;
-                        
                         if (obj.media) {
                             let ytMatch = obj.media.match(/(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/))([\w-]{11})/i);
-                            
-                            if(obj.media.match(/\.(glb|gltf)$/i)) {
-                                htmlContent += `<model-viewer src="${obj.media}" auto-rotate camera-controls style="width: 100%; height: 200px; background-color: transparent; border-radius: 8px; margin-top:5px; pointer-events:auto;"></model-viewer>`;
-                            }
-                            else if(ytMatch && ytMatch[1]) {
-                                const videoId = ytMatch[1];
-                                htmlContent += `<iframe width="100%" height="160" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius:8px; margin-top:5px; pointer-events:auto; background:#000;"></iframe>`;
-                                
-                                htmlContent += `
-                                    <div style="text-align:center; margin-top:10px;">
-                                        <a href="https://youtu.be/${videoId}" target="_blank" style="display:inline-block; padding:8px 15px; background:var(--danger); color:#fff; border-radius:20px; text-decoration:none; font-size:12px; pointer-events:auto; font-weight:bold; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);">
-                                            ▶️ Abrir no App do YouTube
-                                        </a>
-                                    </div>`;
-                            }
-                            else if(obj.media.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-                                htmlContent += `<img src="${obj.media}" style="max-width:100%; max-height:150px; border-radius:8px; margin-top:5px; pointer-events:none;">`;
-                            }
-                            else if(obj.media.startsWith('http')) {
-                                htmlContent += `<a href="${obj.media}" target="_blank" style="display:inline-block; margin-top:5px; padding:8px 15px; background:var(--accent); color:#fff; border-radius:20px; text-decoration:none; font-size:12px; pointer-events:auto;">🔗 Acessar Link Mídia</a>`;
-                            }
+                            if(obj.media.match(/\.(glb|gltf)$/i)) htmlContent += `<model-viewer src="${obj.media}" auto-rotate camera-controls style="width: 100%; height: 200px; background-color: transparent; border-radius: 8px; margin-top:5px; pointer-events:auto;"></model-viewer>`;
+                            else if(ytMatch && ytMatch[1]) htmlContent += `<iframe width="100%" height="160" src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="border-radius:8px; margin-top:5px; pointer-events:auto; background:#000;"></iframe><div style="text-align:center; margin-top:10px;"><a href="https://youtu.be/${ytMatch[1]}" target="_blank" style="display:inline-block; padding:8px 15px; background:var(--danger); color:#fff; border-radius:20px; text-decoration:none; font-size:12px; pointer-events:auto; font-weight:bold; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);">▶️ Abrir no App do YouTube</a></div>`;
+                            else if(obj.media.match(/\.(jpeg|jpg|gif|png|webp)$/i)) htmlContent += `<img src="${obj.media}" style="max-width:100%; max-height:150px; border-radius:8px; margin-top:5px; pointer-events:none;">`;
+                            else if(obj.media.startsWith('http')) htmlContent += `<a href="${obj.media}" target="_blank" style="display:inline-block; margin-top:5px; padding:8px 15px; background:var(--accent); color:#fff; border-radius:20px; text-decoration:none; font-size:12px; pointer-events:auto;">🔗 Acessar Link Mídia</a>`;
                         }
-
-                        if (obj.text) {
-                            htmlContent += `<p style="font-size:14px; margin-top:10px;">${obj.text}</p>`;
-                        }
+                        if (obj.text) htmlContent += `<p style="font-size:14px; margin-top:10px;">${obj.text}</p>`;
+                        if(obj.ownerId === mySecureId && mySecureId != null) htmlContent += `<div style="display:flex; gap:5px; margin-top:15px; pointer-events:auto;"><button style="background:var(--accent); border:none; color:#fff; padding:6px; border-radius:5px; font-size:11px; cursor:pointer; flex:1;" onclick="openAREditor('${obj.id}')">📐 Editar Posição</button><button style="background:transparent; border:1px solid var(--danger); color:var(--danger); padding:6px; border-radius:5px; font-size:11px; cursor:pointer; flex:0.4;" onclick="db.ref('ar_objects/${obj.id}').remove()">🗑️</button></div>`;
                         
-                        if(obj.ownerId === mySecureId && mySecureId != null) {
-                            htmlContent += `<div style="display:flex; gap:5px; margin-top:15px; pointer-events:auto;">
-                                                <button style="background:var(--accent); border:none; color:#fff; padding:6px; border-radius:5px; font-size:11px; cursor:pointer; flex:1;" onclick="openAREditor('${obj.id}')">📐 Editar Posição</button>
-                                                <button style="background:transparent; border:1px solid var(--danger); color:var(--danger); padding:6px; border-radius:5px; font-size:11px; cursor:pointer; flex:0.4;" onclick="db.ref('ar_objects/${obj.id}').remove()">🗑️</button>
-                                            </div>`;
-                        }
-                        card.innerHTML = htmlContent;
-                        card.style.transformOrigin = 'center center'; 
-                        overlayContainer.appendChild(card);
-                    }
-                    
-                    if (!currentEditingAR || currentEditingAR.id !== obj.id) {
-                        const t = obj.transform || { x: 50, y: 50, scale: 1, rotX: 0, rotY: 0, rotZ: 0 };
-                        
-                        let bHead = obj.baseHeading || 0;
-                        let bPitch = obj.basePitch || 90;
-
-                        let deltaHeading = compassHeading - bHead;
-                        if (deltaHeading > 180) deltaHeading -= 360;
-                        if (deltaHeading < -180) deltaHeading += 360;
-
-                        let deltaPitch = devicePitch - bPitch;
-
-                        let screenX = t.x - (deltaHeading * 1.666);
-                        let screenY = t.y - (deltaPitch * 2.222);
-
-                        let distScale = 1;
-                        if(dist > 2) { distScale = 2 / dist; }
-                        if(distScale < 0.2) distScale = 0.2; 
-                        
-                        let finalScale = t.scale * distScale;
-
-                        card.style.left = `${screenX}%`; 
-                        card.style.top = `${screenY}%`;
-                        card.style.transform = `translate(-50%, -50%) scale(${finalScale}) rotateX(${t.rotX}deg) rotateY(${t.rotY}deg) rotateZ(${t.rotZ}deg)`;
+                        card.innerHTML = htmlContent; card.style.transformOrigin = 'center center'; overlayContainer.appendChild(card);
                     }
                 }
             });
-            
             Array.from(overlayContainer.children).forEach(child => { 
-                if(child.classList.contains('ar-item-card')) {
-                    const rawId = child.id.replace('ar-', '');
-                    if(!activeIds.has(rawId)) overlayContainer.removeChild(child);
+                if(child.classList.contains('ar-item-card')) { const rawId = child.id.replace('ar-', ''); if(!activeIds.has(rawId)) overlayContainer.removeChild(child); }
+            });
+        }
+
+        // --- MOTOR DE ANCORAGEM 60FPS (Roda independente da IA para garantir o efeito estátua) ---
+        function runSpatialAnchorLoop() {
+            if(!document.getElementById('screen-radar').classList.contains('active')) return;
+            
+            arObjectsList.forEach(obj => {
+                let card = document.getElementById(`ar-${obj.id}`);
+                if (card) {
+                    let transformToUse = obj.transform || { x: 50, y: 50, scale: 1, rotX: 0, rotY: 0, rotZ: 0 };
+                    
+                    // Se o usuário estiver editando, assume a posição temporária dos sliders
+                    if (currentEditingAR && currentEditingAR.id === obj.id) {
+                        transformToUse = {
+                            x: parseFloat(document.getElementById('ar-edit-x').value), y: parseFloat(document.getElementById('ar-edit-y').value),
+                            scale: parseFloat(document.getElementById('ar-edit-scale').value),
+                            rotX: parseFloat(document.getElementById('ar-edit-rotX').value), rotY: parseFloat(document.getElementById('ar-edit-rotY').value), rotZ: parseFloat(document.getElementById('ar-edit-rotZ').value)
+                        };
+                    }
+
+                    let bHead = obj.baseHeading || 0;
+                    let bPitch = obj.basePitch || 90;
+
+                    let deltaHeading = compassHeading - bHead;
+                    if (deltaHeading > 180) deltaHeading -= 360;
+                    if (deltaHeading < -180) deltaHeading += 360;
+
+                    let deltaPitch = devicePitch - bPitch;
+
+                    // O multiplicador compensa o campo de visão (FOV) da lente do celular
+                    let screenX = transformToUse.x - (deltaHeading * 1.666);
+                    let screenY = transformToUse.y - (deltaPitch * 2.222);
+
+                    let dist = myGeoPos ? getDistanceFromLatLonInM(myGeoPos.lat, myGeoPos.lng, obj.lat, obj.lng) : 1;
+                    let distScale = dist > 2 ? 2 / dist : 1;
+                    if(distScale < 0.2) distScale = 0.2; 
+                    
+                    let finalScale = transformToUse.scale * distScale;
+
+                    // Atualização direta do CSS Frame-by-Frame, sem travar
+                    card.style.left = `${screenX}%`; 
+                    card.style.top = `${screenY}%`;
+                    card.style.transform = `translate(-50%, -50%) scale(${finalScale}) rotateX(${transformToUse.rotX}deg) rotateY(${transformToUse.rotY}deg) rotateZ(${transformToUse.rotZ}deg)`;
                 }
             });
+            requestAnimationFrame(runSpatialAnchorLoop);
         }
 
         async function startRadarView() {
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                try {
-                    await DeviceOrientationEvent.requestPermission();
-                } catch (e) { console.warn("Permissão de giroscópio ignorada ou não suportada", e); }
+                try { await DeviceOrientationEvent.requestPermission(); } catch (e) { }
             }
 
             if(isVoiceActive) speakNeural("Você agora está online e com mapeamento ativo.");
@@ -1006,11 +904,16 @@
             }
 
             const video = document.getElementById('video-radar'); const canvas = document.getElementById('canvas-ar'); const overlayContainer = document.getElementById('html-overlay-container');
-            const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.60, maxResults: 4 }); 
+            
+            // OTIMIZAÇÃO DE IA: O inputSize é o grande segredo. 
+            // Permite usar câmera HD, mas reduz a imagem internamente para a IA não travar o celular.
+            const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.60, maxResults: 4, inputSize: 224 }); 
+
+            // Dispara o motor de 60fps da Realidade Aumentada (Desconectado do peso da IA)
+            requestAnimationFrame(runSpatialAnchorLoop);
 
             let lastProcessingTime = 0; let loggedViewersThisSession = new Set(); 
-            let processingDelay = 250; 
-            let isRadarDetecting = false; 
+            let processingDelay = 250; let isRadarDetecting = false; 
 
             video.addEventListener('play', () => {
                 const dims = { width: video.clientWidth, height: video.clientHeight }; faceapi.matchDimensions(canvas, dims);
@@ -1019,15 +922,12 @@
                     if(video.paused || video.ended || !document.getElementById('screen-radar').classList.contains('active')) return;
                     
                     const now = Date.now();
-                    
-                    // Renderiza os objetos AR fixos a todo momento
-                    renderARObjects(overlayContainer);
+
+                    // Sincroniza a criação e destruição do DOM devagar, enquanto o loop 60fps movimenta
+                    syncARDOM(overlayContainer);
 
                     if (now - lastProcessingTime > processingDelay && !isRadarDetecting) { 
-                        isRadarDetecting = true;
-                        lastProcessingTime = now;
-                        const t0 = performance.now(); 
-                        
+                        isRadarDetecting = true; lastProcessingTime = now; const t0 = performance.now(); 
                         try {
                             const detections = await faceapi.detectAllFaces(video, options).withFaceLandmarks().withFaceDescriptors();
                             const timeTaken = performance.now() - t0;
@@ -1035,18 +935,13 @@
 
                             const resized = faceapi.resizeResults(detections, dims);
                             const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            const currentFrameIds = new Set();
                             
                             resized.forEach(d => {
-                                const match = findBestMatch(d.descriptor);
-                                const { x, y, width, height } = d.detection.box;
-                                
+                                const match = findBestMatch(d.descriptor); const { x, y, width, height } = d.detection.box;
                                 const amIBlocked = match.blocked && mySecureId && match.blocked[mySecureId] === true;
                                 const amILookingAtMyself = (match.id === mySecureId); 
 
                                 if (match.distance < 0.38 && !amIBlocked) {
-                                    currentFrameIds.add(match.id);
-
                                     if(!loggedViewersThisSession.has(match.id) && !amILookingAtMyself && match.id !== null) {
                                         loggedViewersThisSession.add(match.id);
                                         db.ref('identities/' + match.id + '/viewers').push({ viewerId: mySecureId || "anon", viewerName: myNameLocal, time: Date.now() });
@@ -1065,7 +960,6 @@
                                         if (match.prefs.showContact && match.contact) innerContent += `<p>📞 ${match.contact}</p>`;
                                         if (match.prefs.showLink && match.link) innerContent += `<p style="color: var(--accent); margin-top:6px;">🔗 Acessar Link Externo</p>`;
                                         innerContent += `<p class="tap-hint">Tocar para expandir</p>`;
-                                        
                                         card.innerHTML = innerContent; overlayContainer.appendChild(card);
                                         
                                         card.onclick = () => {
@@ -1073,28 +967,21 @@
                                             if (match.prefs.showBio && match.bio) htmlContent += `<p style="margin: 8px 0; color: #475569;">💼 ${match.bio}</p>`;
                                             if (match.prefs.showContact && match.contact) htmlContent += `<p style="margin: 8px 0; color: #475569;">📞 ${match.contact}</p>`;
                                             if (match.prefs.showLink && match.link) htmlContent += `<a href="${match.link}" target="_blank" style="display:inline-block; margin-top:15px; padding:12px 25px; background:var(--accent); color:#fff; border-radius:25px; text-decoration:none; font-size:14px; font-weight:400; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);">🔗 Acessar Link</a>`;
-                                            
-                                            Swal.fire({ 
-                                                title: match.prefs.showName ? match.name : 'Usuário Identificado', 
-                                                html: htmlContent || '<p>Informações privadas.</p>',
-                                                showConfirmButton: true,
-                                                confirmButtonText: 'Fechar',
-                                                confirmButtonColor: 'var(--dark)'
-                                            });
+                                            Swal.fire({ title: match.prefs.showName ? match.name : 'Usuário Identificado', html: htmlContent || '<p>Informações privadas.</p>', showConfirmButton: true, confirmButtonText: 'Fechar', confirmButtonColor: 'var(--dark)' });
                                         };
                                     }
                                     card.style.left = `${x}px`; card.style.top = `${y + height + 15}px`;
-                                    
                                 } else {
-                                    ctx.save(); ctx.filter = 'blur(20px)'; ctx.fillStyle = 'rgba(239, 68, 68, 0.85)'; 
-                                    const padding = 20; ctx.fillRect(x - padding, y - padding, width + (padding*2), height + (padding*2)); ctx.restore(); 
+                                    ctx.save(); ctx.filter = 'blur(20px)'; ctx.fillStyle = 'rgba(239, 68, 68, 0.85)'; const padding = 20; ctx.fillRect(x - padding, y - padding, width + (padding*2), height + (padding*2)); ctx.restore(); 
                                 }
                             });
-
+                            
+                            // Limpa apenas os cartões de ROSTOS que saíram da tela
                             Array.from(overlayContainer.children).forEach(child => { 
-                                if(child.classList.contains('ar-item-card')) return; 
-                                const rawId = child.id.replace('card-', ''); 
-                                if (!currentFrameIds.has(rawId)) overlayContainer.removeChild(child); 
+                                if(child.id.startsWith('card-')) {
+                                    const rawId = child.id.replace('card-', ''); 
+                                    if (!Array.from(resized).some(d => findBestMatch(d.descriptor).id === rawId)) overlayContainer.removeChild(child); 
+                                }
                             });
                         } catch(e) { }
                         isRadarDetecting = false;
